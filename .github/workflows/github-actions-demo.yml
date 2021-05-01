@@ -1,9 +1,15 @@
-name: Buildd
+name: Build
 on: [push]
 jobs:
-  build:
+  build-server:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
       - run: docker build -f ${{ github.workspace }}/server/dockerfile -t jaska/invertarify/server ${{ github.workspace }}/server
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - run: docker build -f ${{ github.workspace }}/web/dockerfile -t jaska/invertarify/web ${{ github.workspace }}/web
