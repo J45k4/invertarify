@@ -6,7 +6,11 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: docker build -f ${{ github.workspace }}/server/dockerfile -t jaska/invertarify/server ${{ github.workspace }}/server
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ github.workspace }}/server
+          tags: jaska/invertarify/server
   build-web:
     runs-on: ubuntu-latest
     steps:
