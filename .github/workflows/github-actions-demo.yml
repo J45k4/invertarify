@@ -28,6 +28,12 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: Docker meta
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
+        with:
+          images: jaska/invertarify-web
+          tags: type=sha
       - name: Login to Dockerhub
         uses: docker/login-action@v1
         with:
@@ -38,4 +44,4 @@ jobs:
         with:
           context: ${{ github.workspace }}/web
           push: true
-          tags: jaska/invertarify-web
+          tags: ${{ steps.meta.outputs.tags }}
