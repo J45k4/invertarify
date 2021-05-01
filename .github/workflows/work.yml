@@ -47,7 +47,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
   deploy-web:
   needs: build-web
-    runs-on:
+    runs-on: ubuntu-latest
     steps:
       - name: Docker meta
         id: meta
