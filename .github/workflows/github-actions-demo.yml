@@ -1,7 +1,7 @@
 name: Buildd
 on: [push]
 jobs:
-	build:
-		run-on: docker
-		steps:
-			- run: docker build -f ./server/dockerfile -t jaska/invertarify/server ./server
+  build:
+    run-on: docker
+    steps:
+      - run: docker build -f ./server/dockerfile -t jaska/invertarify/server ./server
