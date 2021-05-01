@@ -1,0 +1,9 @@
+FROM hayd/debian-deno:1.9.2
+
+WORKDIR /invertarify
+
+COPY ./src ./src
+
+RUN deno cache ./src/app.ts
+
+CMD ["run", "--allow-read", "--allow-net", "src/app.ts"]
