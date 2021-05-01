@@ -38,4 +38,4 @@ jobs:
         with:
           context: ${{ github.workspace }}/web
           push: true
-          tags: jaska/invertarify-web:${{ GITHUB_SHA }}
+          tags: jaska/invertarify-web
