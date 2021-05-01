@@ -9,6 +9,8 @@ ADD ./tsconfig.json ./tsconfig.json
 
 COPY ./pages ./pages
 COPY ./src ./src
+COPY ./public ./public
+COPY ./styles ./styles
 
 RUN npm run build
 
