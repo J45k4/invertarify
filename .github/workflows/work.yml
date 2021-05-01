@@ -45,3 +45,20 @@ jobs:
           context: ${{ github.workspace }}/web
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+  deploy-web:
+  needs: build-web
+    runs-on:
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
+        with:
+          images: jaska/invertarify-web
+          tags: type=sha
+      - uses: appleboy/ssh-action@master
+        with: 
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker kill invertarify-web
+            docker run ${{ steps.meta.outputs.tags }}
+    
