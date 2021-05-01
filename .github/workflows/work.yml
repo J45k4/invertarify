@@ -63,4 +63,4 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             docker kill invertarify-web
-            docker run -d ${{ steps.meta.outputs.tags }}
+            docker run --name invertarify-web -d ${{ steps.meta.outputs.tags }}
