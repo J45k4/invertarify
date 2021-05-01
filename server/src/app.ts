@@ -1,5 +1,6 @@
 import { Client } from "https://deno.land/x/mysql/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
+import { runMigrations } from "./migrations.ts"
 
 const {
 	DB_HOST,
@@ -14,6 +15,8 @@ const client = await new Client().connect({
     db: DB_NAME,
     password: DB_PASS,
   });
+
+await runMigrations(client)
 
 // client.query(`
 // create table items (
