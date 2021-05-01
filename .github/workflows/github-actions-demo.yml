@@ -16,7 +16,7 @@ jobs:
         with:
           context: ${{ github.workspace }}/server
           push: true
-          tags: jaska/invertarify-server
+          tags: jaska/invertarify-server:${{ GITHUB_SHA }}
   build-web:
     runs-on: ubuntu-latest
     steps:
@@ -32,4 +32,4 @@ jobs:
         with:
           context: ${{ github.workspace }}/web
           push: true
-          tags: jaska/invertarify-web
+          tags: jaska/invertarify-web:${{ GITHUB_SHA }}
