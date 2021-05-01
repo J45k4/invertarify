@@ -16,4 +16,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: docker build -f ${{ github.workspace }}/web/dockerfile -t jaska/invertarify/web ${{ github.workspace }}/web
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ github.workspace }}/web
+          tags: jaska/invertarify/web
