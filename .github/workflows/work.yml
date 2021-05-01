@@ -56,7 +56,10 @@ jobs:
           images: jaska/invertarify-web
           tags: type=sha
       - uses: appleboy/ssh-action@master
-        with: 
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             docker kill invertarify-web
