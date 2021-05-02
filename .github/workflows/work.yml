@@ -23,6 +23,25 @@ jobs:
           context: ${{ github.workspace }}/server
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+  deploy-server:
+    needs: build-server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: crazy-max/ghaction-docker-meta@v2
+        with:
+          images: jaska/invertarify-server
+          tags: type=sha
+      - uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker kill invertarify-server
+            docker run -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_PASS=${{ secrets.DB_PASS }} -e DB_USER=${{ secrets.DB_USER }} --name invertarify-server -d ${{ steps.meta.outputs.tags }}
   build-web:
     runs-on: ubuntu-latest
     steps:
