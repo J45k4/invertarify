@@ -41,7 +41,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             docker kill invertarify-server
-            docker run -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_PASS=${{ secrets.DB_PASS }} -e DB_USER=${{ secrets.DB_USER }} --name invertarify-server -d ${{ steps.meta.outputs.tags }}
+            docker run --network="host" -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_PASS=${{ secrets.DB_PASS }} -e DB_USER=${{ secrets.DB_USER }} -d ${{ steps.meta.outputs.tags }}
   build-web:
     runs-on: ubuntu-latest
     steps:
