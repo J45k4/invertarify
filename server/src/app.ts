@@ -21,7 +21,8 @@ console.log(DB_HOST, DB_NAME, DB_PASS, DB_USER)
 const client = await new Client().connect({
     hostname: DB_HOST,
     username: DB_USER,
-    db: DB_NAME
+    db: DB_NAME,
+    password: DB_PASS,
   });
 
 console.log("running migrations")
