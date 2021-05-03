@@ -1,5 +1,5 @@
 
-const url = "http://localhost:3090"
+const url = process.env.NEXT_PUBLIC_SERVER_URL ? process.env.NEXT_PUBLIC_SERVER_URL : "" 
 
 const postJson = async (path: string, body: any) => {
 	return fetch(`${url}${path}`, {
@@ -21,13 +21,13 @@ const getJson = async (path: string) => {
 export const createItem = (args: {
 	name: string
 }) => {
-	return postJson("/item", {
+	return postJson("/api/item", {
 		name: args.name
 	})
 }
 
 export const searchItems = () => {
-	const u = `/search_items`
+	const u = `/api/search_items`
 
 	return getJson(u)
 }
