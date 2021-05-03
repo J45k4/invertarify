@@ -84,4 +84,4 @@ jobs:
           script: |
             docker kill invertarify-web
             docker rm invertarify-web
-            docker run --name invertarify-web -d ${{ steps.meta.outputs.tags }}
+            docker run --network="host" --name invertarify-web -d ${{ steps.meta.outputs.tags }}
