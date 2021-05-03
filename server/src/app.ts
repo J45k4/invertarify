@@ -53,7 +53,7 @@ app.post("/api/item", async (req, res) => {
 
     console.log(body)
 
-    await client.query("insert into items(name) values(?)", [body.name])
+    await client.query("insert into items(name, created_at) values(?, ?)", [body.name, new Date()])
 
     res.json({
         result: "ok"
