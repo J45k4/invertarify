@@ -32,6 +32,8 @@ export const CreateItemModal = (props: {
                 <Button onClick={() => {
 					createItem({
 						name: name
+					}).then(() => {
+						props.onSuccess()
 					})
 				}}>
                     Create

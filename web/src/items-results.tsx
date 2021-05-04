@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { searchItems } from "./api"
+import Link from "next/link"
 
 export const ItemsResults = () => {
 	const [ items, setItems ] = useState([])
@@ -14,7 +15,9 @@ export const ItemsResults = () => {
 	return <div>
 		{items.map(p => (
 			<div>
-				{p.name}
+				<Link href={`/item/${p.id}`}>
+					{p.name}
+				</Link>		
 			</div>
 		))}
 	</div>
