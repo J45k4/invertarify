@@ -2,15 +2,16 @@
     "configurations": [
         {
             "name": "Run server",
-            "type": "pwa-node",
+            "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/src/app.ts",
+            "program": "${workspaceFolder}/src/graphql.ts",
             "cwd": "${workspaceFolder}",
             "runtimeExecutable": "deno",
             "runtimeArgs": [
                 "run",
                 "--inspect=127.0.0.1:9229",
-                "--allow-all"
+                "--allow-all",
+				"--unstable"
             ],
             "attachSimplePort": 9229,
 			"envFile": "${workspaceFolder}/.env",
