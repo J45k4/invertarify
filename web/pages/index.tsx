@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { Button, Card, Container } from 'react-bootstrap'
+import { ContainerList } from '../src/container/container-list'
 import { CreateItemModal } from '../src/create-item-modal'
 import { ItemsList } from '../src/item/items-list'
 import { Items } from '../src/items'
@@ -39,6 +40,8 @@ export default function Home() {
 					onCancel={() => {
 						setCreating(false)
 					}} />
+
+				<ContainerList />
 			</Container>
 		</Fragment>
 	)

@@ -1,9 +1,9 @@
-FROM hayd/debian-deno:1.9.2
+FROM golang:1.16
 
-WORKDIR /invertarify
+WORKDIR /go/src/invertarify
 
-COPY ./src ./src
+COPY . .
 
-RUN deno cache ./src/app.ts
+RUN go build main.go
 
-CMD ["run", "--allow-read", "--allow-net", "--allow-env", "src/app.ts"]
+CMD ["./main"]

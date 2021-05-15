@@ -1,0 +1,72 @@
+
+type Container {
+    id: ID!
+    name: String
+    items: ContainerItemsConnection!
+    containers: ContainerContainersConnection!
+    pictures: ContainerPicturesConnection!
+    possibleItemsToAdd: [Item!]!
+}
+
+type ContainersConnection {
+	containers: [Container!]!
+}
+
+type ContainerContainersConnection {
+    edges: [ContainerEdge]
+}
+
+type ContainerEdge {
+    cursor: String!
+    node: Container
+}
+
+type ContainerItemsConnection {
+    items: [Item!]!
+}
+
+type ContainerPicturesConnection {
+    edges: [PictureEdge]
+}
+
+input CreateContainer {
+    parentContainerId: ID
+    name: String
+}
+
+type CreateContainerResponse {
+    error: Error
+    container: Container
+}
+
+input PlaceContainerToContainer {
+    srcContainerId: ID!
+    dstContainerId: ID!
+}
+
+type PlaceContainerToContainerResponse {
+    error: Error
+}
+
+enum ContainerType {
+    Root
+    Child
+    All
+}
+
+input ContaninersSearchOptions {
+    containerType: ContainerType = All
+    parentContainerId: ID
+    searchWord: String
+    after: String
+    first: Int
+}
+
+input ArchiveContainer {
+    containerId: ID
+    archiveContent: Boolean
+}
+
+type ArchiveContainerResponse {
+    error: Error
+}

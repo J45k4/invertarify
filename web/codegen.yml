@@ -1,0 +1,19 @@
+schema: ../server/graph/schema/*.gql
+documents:
+  - ./src/**/!(*.generated).{ts,tsx,gql}
+overwrite: true
+config:
+  noNamespaces: true
+  withHooks: true
+generates:
+  ./src/gnerated-graphql-types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      withHooks: true
+      withHOC: false
+      withComponent: false
+      reactApolloVersion: 3
+      enumsAsTypes: true

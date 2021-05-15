@@ -1,12 +1,26 @@
+import gql from "graphql-tag"
 import React, { useState } from "react"
 import { Button, FormControl, Modal } from "react-bootstrap"
-import { createItem } from "./api"
+import { useCreateItemMutation } from "./gnerated-graphql-types"
+
+gql`
+	mutation createItem($input: CreateItem!) {
+		createItem(input: $input) {
+			item {
+				id
+				name
+			}
+		}
+	}
+`
 
 export const CreateItemModal = (props: {
     show: boolean
     onSuccess: () => void
     onCancel: () => void
 }) => {
+	const [createItem] = useCreateItemMutation()
+
 	const [name, setName] = useState("")
 
     return (
@@ -31,7 +45,12 @@ export const CreateItemModal = (props: {
                 </Button>
                 <Button onClick={() => {
 					createItem({
-						name: name
+						variables: {
+							input: {
+								name: name
+							}
+						}
+						
 					}).then(() => {
 						props.onSuccess()
 					})

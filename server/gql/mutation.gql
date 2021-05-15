@@ -1,4 +1,0 @@
-
-type Mutation {
-	createItem(input: CreateItem!): CreateItemResponse!
-}

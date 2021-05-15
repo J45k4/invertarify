@@ -13,7 +13,8 @@ export default function ItemPage() {
         <Container>
 			<Row>
 				<Col>
-					<ModifyItemForm itemId={itemId} />
+					{itemId && 
+					<ModifyItemForm itemId={itemId} />}
 				</Col>
 				<Col>
 					<ItemImages />

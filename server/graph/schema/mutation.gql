@@ -1,0 +1,11 @@
+
+type Mutation {
+    createItem(input: CreateItem!): CreateItemResponse!
+	updateItem(input: UpdateItem!): UpdateItemResponse!
+    addPictureForItem(input: AddPictureForItem!): AddPictureForItemResponse!
+    createContainer(input: CreateContainer!): CreateContainerResponse!
+    placeItemToContainer(input: PlaceItemToContainer!): PlaceItemToContainerResponse!
+    placeContainerToContainer(input: PlaceContainerToContainer!): PlaceContainerToContainerResponse!
+    archiveItem(input: ArchiveItem!): ArchiveItemResponse!
+    archiveContainer(input: ArchiveContainer!): ArchiveContainerResponse!
+}

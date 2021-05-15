@@ -1,0 +1,18 @@
+
+type Picture {
+    id: ID!
+}
+
+type PictureEdge {
+    cursor: String!
+    node: Picture
+}
+
+input AddPictureForItem {
+    itemId: ID!
+    picture: Upload!
+}
+
+type AddPictureForItemResponse {
+    error: Error
+}

@@ -1,0 +1,8 @@
+
+type Query {
+    item(itemId: ID!): Item
+    items(input: Items!): ItemsConnection!
+    container(containerId: ID!): Container
+    containers(input: ContaninersSearchOptions): ContainersConnection!
+    picture(pictureId: ID!): Picture
+}

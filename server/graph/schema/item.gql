@@ -1,0 +1,66 @@
+type Item {
+    id: ID!
+    name: String
+	metadata: String
+    barcode: String
+    pictures: ItemPicturesConnection!
+}
+
+type ItemsConnection {
+    items: [Item!]!
+}
+
+type ItemPicturesConnection {
+    edges: [PictureEdge]
+}
+
+enum ItemStatus {
+    All
+    InUse
+    NotInUse
+}
+
+input Items {
+    barcode: String
+    searchWord: String
+    containerId: ID
+    status: ItemStatus
+}
+
+input CreateItem {
+    name: String
+    barcode: String
+    containerId: String
+}
+
+type CreateItemResponse {
+    error: Error
+    item: Item
+}
+
+input PlaceItemToContainer {
+    containerId: ID!
+    itemId: ID!
+}
+
+type PlaceItemToContainerResponse {
+    error: Error
+}
+
+input ArchiveItem {
+    itemId: ID!
+}
+
+type ArchiveItemResponse {
+    error: Error
+}
+
+input UpdateItem {
+	itemId: ID!
+	name: String
+	metadata: String
+}
+
+type UpdateItemResponse {
+	item: Item!
+}
