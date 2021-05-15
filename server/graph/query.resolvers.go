@@ -92,6 +92,22 @@ func (r *queryResolver) Picture(ctx context.Context, pictureID string) (*models.
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) RootContainers(ctx context.Context) ([]*models.Container, error) {
+	containers := []*models.Container{}
+
+	r.DB.Find(&containers)
+
+	return containers, nil
+}
+
+func (r *queryResolver) ItemsWithoutContainer(ctx context.Context) ([]*models.Item, error) {
+	items := []*models.Item{}
+
+	r.DB.Where("container_id is null").Find(&items)
+
+	return items, nil
+}
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 

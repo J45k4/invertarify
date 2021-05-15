@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 import React, { Fragment, useEffect, useState } from "react"
 import { Card, Form } from "react-bootstrap"
-import { useModify_Item_FormQuery, useUpdateItemMutation } from "../gnerated-graphql-types"
+import { useModify_Item_FormQuery, useUpdateItemMutation } from "../generated-graphql-types"
 import { useAutoUpdateValue } from "../input-hooks"
 
 gql`

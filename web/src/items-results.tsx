@@ -3,7 +3,7 @@ import { searchItems } from "./api"
 import Link from "next/link"
 import gql from "graphql-tag"
 
-import { useItems_ResultsQuery } from "./gnerated-graphql-types"
+import { useItems_ResultsQuery } from "./generated-graphql-types"
 
 gql`
 	query items_results($input: Items!) {

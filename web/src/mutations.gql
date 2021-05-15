@@ -8,3 +8,18 @@ mutation updateItem($input: UpdateItem!) {
 		}
 	}
 }
+
+mutation createContainer($input: CreateContainer!) {
+	createContainer(input: $input) {
+		container {
+			id
+			name
+		}
+	}
+}
+
+mutation placeItemToContainer($input: PlaceItemToContainer!) {
+	placeItemToContainer(input: $input) {
+		__typename
+	}
+}

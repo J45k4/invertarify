@@ -149,11 +149,13 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Container  func(childComplexity int, containerID string) int
-		Containers func(childComplexity int, input *gmodels.ContaninersSearchOptions) int
-		Item       func(childComplexity int, itemID string) int
-		Items      func(childComplexity int, input gmodels.Items) int
-		Picture    func(childComplexity int, pictureID string) int
+		Container             func(childComplexity int, containerID string) int
+		Containers            func(childComplexity int, input *gmodels.ContaninersSearchOptions) int
+		Item                  func(childComplexity int, itemID string) int
+		Items                 func(childComplexity int, input gmodels.Items) int
+		ItemsWithoutContainer func(childComplexity int) int
+		Picture               func(childComplexity int, pictureID string) int
+		RootContainers        func(childComplexity int) int
 	}
 
 	UpdateItemResponse struct {
@@ -191,6 +193,8 @@ type QueryResolver interface {
 	Container(ctx context.Context, containerID string) (*models.Container, error)
 	Containers(ctx context.Context, input *gmodels.ContaninersSearchOptions) (*gmodels.ContainersConnection, error)
 	Picture(ctx context.Context, pictureID string) (*models.Picture, error)
+	RootContainers(ctx context.Context) ([]*models.Container, error)
+	ItemsWithoutContainer(ctx context.Context) ([]*models.Item, error)
 }
 
 type executableSchema struct {
@@ -583,6 +587,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Items(childComplexity, args["input"].(gmodels.Items)), true
 
+	case "Query.itemsWithoutContainer":
+		if e.complexity.Query.ItemsWithoutContainer == nil {
+			break
+		}
+
+		return e.complexity.Query.ItemsWithoutContainer(childComplexity), true
+
 	case "Query.picture":
 		if e.complexity.Query.Picture == nil {
 			break
@@ -594,6 +605,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Picture(childComplexity, args["pictureId"].(string)), true
+
+	case "Query.rootContainers":
+		if e.complexity.Query.RootContainers == nil {
+			break
+		}
+
+		return e.complexity.Query.RootContainers(childComplexity), true
 
 	case "UpdateItemResponse.item":
 		if e.complexity.UpdateItemResponse.Item == nil {
@@ -813,6 +831,7 @@ type ArchiveItemResponse {
 
 input UpdateItem {
 	itemId: ID!
+	containerId: ID
 	name: String
 	metadata: String
 }
@@ -856,6 +875,8 @@ type Query {
     container(containerId: ID!): Container
     containers(input: ContaninersSearchOptions): ContainersConnection!
     picture(pictureId: ID!): Picture
+	rootContainers: [Container!]!
+	itemsWithoutContainer: [Item!]!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -2744,6 +2765,76 @@ func (ec *executionContext) _Query_picture(ctx context.Context, field graphql.Co
 	return ec.marshalOPicture2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐPicture(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_rootContainers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().RootContainers(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Container)
+	fc.Result = res
+	return ec.marshalNContainer2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainerᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_itemsWithoutContainer(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ItemsWithoutContainer(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐItemᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4247,6 +4338,14 @@ func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj in
 			if err != nil {
 				return it, err
 			}
+		case "containerId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("containerId"))
+			it.ContainerID, err = ec.unmarshalOID2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "name":
 			var err error
 
@@ -5003,6 +5102,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_picture(ctx, field)
+				return res
+			})
+		case "rootContainers":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_rootContainers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "itemsWithoutContainer":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_itemsWithoutContainer(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			})
 		case "__type":

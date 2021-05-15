@@ -131,9 +131,10 @@ type PlaceItemToContainerResponse struct {
 }
 
 type UpdateItem struct {
-	ItemID   string  `json:"itemId"`
-	Name     *string `json:"name"`
-	Metadata *string `json:"metadata"`
+	ItemID      string  `json:"itemId"`
+	ContainerID *string `json:"containerId"`
+	Name        *string `json:"name"`
+	Metadata    *string `json:"metadata"`
 }
 
 type UpdateItemResponse struct {

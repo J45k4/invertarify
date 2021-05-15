@@ -5,4 +5,6 @@ type Query {
     container(containerId: ID!): Container
     containers(input: ContaninersSearchOptions): ContainersConnection!
     picture(pictureId: ID!): Picture
+	rootContainers: [Container!]!
+	itemsWithoutContainer: [Item!]!
 }

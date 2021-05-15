@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { Button, Card, Container } from 'react-bootstrap'
 import { ContainerList } from '../src/container/container-list'
+import { ContainerTree } from '../src/container/container-tree'
+import { CreateContainerForm } from '../src/container/create-container-modal'
 import { CreateItemModal } from '../src/create-item-modal'
 import { ItemsList } from '../src/item/items-list'
 import { Items } from '../src/items'
@@ -11,6 +13,7 @@ import styles from '../styles/Home.module.css'
 
 export default function Home() {
 	const [creating, setCreating] = useState(false)
+	const [con, setCon] = useState(false)
 
 	return (
 		<Fragment>
@@ -30,7 +33,14 @@ export default function Home() {
 						Create item
 					</Button>
 				</div>
-				<ItemsList />
+				<div>
+					<Button onClick={() => {
+						setCon(true)
+					}}>
+						Create container
+					</Button>
+				</div>
+				<ContainerTree />
 
 				<CreateItemModal
 					show={creating}
@@ -41,7 +51,12 @@ export default function Home() {
 						setCreating(false)
 					}} />
 
-				<ContainerList />
+				<CreateContainerForm
+					show={con}
+					onHide={() => {
+						setCon(false)
+					}}
+				 />
 			</Container>
 		</Fragment>
 	)

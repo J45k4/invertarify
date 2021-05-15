@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 import React, { useState } from "react"
 import { Button, FormControl, Modal } from "react-bootstrap"
-import { useCreateItemMutation } from "./gnerated-graphql-types"
+import { useCreateItemMutation } from "./generated-graphql-types"
 
 gql`
 	mutation createItem($input: CreateItem!) {

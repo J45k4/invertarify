@@ -1,6 +1,6 @@
 import Link from "next/link"
 import React from "react"
-import { Navbar } from "react-bootstrap"
+import { FormControl, Navbar } from "react-bootstrap"
 
 export const NavigationBar = () => {
 	return (
@@ -17,6 +17,9 @@ export const NavigationBar = () => {
 				<Link href="/" passHref>
 					<Navbar.Brand>Invertarify</Navbar.Brand>
 				</Link>
+				<Navbar>
+					<FormControl type="text" />
+				</Navbar>		
 		</Navbar>
 	)
 }

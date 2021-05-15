@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/j45k4/invertarify/graph/generated"
 	gmodels "github.com/j45k4/invertarify/graph/model"
@@ -56,6 +57,16 @@ func (r *mutationResolver) CreateContainer(ctx context.Context, input gmodels.Cr
 }
 
 func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmodels.PlaceItemToContainer) (*gmodels.PlaceItemToContainerResponse, error) {
+	item := models.Item{}
+
+	r.DB.Find(&item, input.ItemID)
+
+	itemID, _ := strconv.Atoi(input.ContainerID)
+
+	item.ContainerID = int32(itemID)
+
+	r.DB.Save(&item)
+
 	// container
 
 	// containerID := uniqueIdAsNullableInt(input.ContainerID)

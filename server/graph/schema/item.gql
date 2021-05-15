@@ -57,6 +57,7 @@ type ArchiveItemResponse {
 
 input UpdateItem {
 	itemId: ID!
+	containerId: ID
 	name: String
 	metadata: String
 }
