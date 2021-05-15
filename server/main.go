@@ -34,6 +34,8 @@ func main() {
 
 	if err != nil {
 		fmt.Println("Sql open error ", err)
+
+		panic("Cannot create db connection")
 	}
 
 	migrations := &migrate.FileMigrationSource{
