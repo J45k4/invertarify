@@ -31,7 +31,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input gmodels.UpdateI
 	r.DB.Find(&item, input.ItemID)
 
 	item.Name = *input.Name
-	item.Metadata = *input.Metadata
+	item.Metadata = input.Metadata
 
 	r.DB.Save(&item)
 
@@ -62,8 +62,9 @@ func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmode
 	r.DB.Find(&item, input.ItemID)
 
 	itemID, _ := strconv.Atoi(input.ContainerID)
+	itemID32 := int32(itemID)
 
-	item.ContainerID = int32(itemID)
+	item.ContainerID = &itemID32
 
 	r.DB.Save(&item)
 
@@ -83,7 +84,7 @@ func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmode
 
 	// item.Update(ctx, r.DB, boil.Infer())
 
-	return &gmodels.PlaceItemToContainerResponse{}, nil
+	return &gmodels.PlaceItemToContainerResponse{}, r.DB.Error
 }
 
 func (r *mutationResolver) PlaceContainerToContainer(ctx context.Context, input gmodels.PlaceContainerToContainer) (*gmodels.PlaceContainerToContainerResponse, error) {
