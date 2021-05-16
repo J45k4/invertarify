@@ -25,8 +25,8 @@ export const ContainerTreeContainer = (props: {
 	containerId: string
 	name: string
 	containers: {
-		id: string,
-		name: string
+		id?: string,
+		name?: string
 	}[]
 	items: {
 		id?: string
