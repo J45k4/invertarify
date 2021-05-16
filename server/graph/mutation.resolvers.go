@@ -88,6 +88,24 @@ func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmode
 }
 
 func (r *mutationResolver) PlaceContainerToContainer(ctx context.Context, input gmodels.PlaceContainerToContainer) (*gmodels.PlaceContainerToContainerResponse, error) {
+	container := models.Container{}
+
+	r.DB.Find(&container, input.SrcContainerID)
+
+	if container.ID == 0 {
+		return &gmodels.PlaceContainerToContainerResponse{}, nil
+	}
+
+	if input.DstContainerID == input.SrcContainerID {
+		return &gmodels.PlaceContainerToContainerResponse{}, nil
+	}
+
+	containerID, _ := strconv.Atoi(input.DstContainerID)
+
+	container.ContainerID = &containerID
+
+	r.DB.Save(container)
+
 	// dstContainer, _ := models.FindContainer(ctx, r.DB, uniqueIdAsInt(input.DstContainerID))
 
 	// if dstContainer == nil {

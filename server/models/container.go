@@ -3,7 +3,8 @@ package models
 import "time"
 
 type Container struct {
-	ID        int
-	Name      string
-	CreatedAt time.Time
+	ID          int
+	Name        string
+	ContainerID *int
+	CreatedAt   time.Time
 }

@@ -69,7 +69,8 @@ type ComplexityRoot struct {
 	}
 
 	ContainerContainersConnection struct {
-		Edges func(childComplexity int) int
+		Containers func(childComplexity int) int
+		Edges      func(childComplexity int) int
 	}
 
 	ContainerEdge struct {
@@ -274,6 +275,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Container.PossibleItemsToAdd(childComplexity), true
+
+	case "ContainerContainersConnection.containers":
+		if e.complexity.ContainerContainersConnection.Containers == nil {
+			break
+		}
+
+		return e.complexity.ContainerContainersConnection.Containers(childComplexity), true
 
 	case "ContainerContainersConnection.edges":
 		if e.complexity.ContainerContainersConnection.Edges == nil {
@@ -710,6 +718,7 @@ type ContainersConnection {
 }
 
 type ContainerContainersConnection {
+	containers: [Container!]!
     edges: [ContainerEdge]
 }
 
@@ -1436,6 +1445,41 @@ func (ec *executionContext) _Container_possibleItemsToAdd(ctx context.Context, f
 	return ec.marshalNItem2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐItemᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ContainerContainersConnection_containers(ctx context.Context, field graphql.CollectedField, obj *gmodels.ContainerContainersConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ContainerContainersConnection",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Containers, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*models.Container)
+	fc.Result = res
+	return ec.marshalNContainer2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainerᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ContainerContainersConnection_edges(ctx context.Context, field graphql.CollectedField, obj *gmodels.ContainerContainersConnection) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1923,9 +1967,9 @@ func (ec *executionContext) _Item_metadata(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_barcode(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
@@ -4544,6 +4588,11 @@ func (ec *executionContext) _ContainerContainersConnection(ctx context.Context, 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ContainerContainersConnection")
+		case "containers":
+			out.Values[i] = ec._ContainerContainersConnection_containers(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "edges":
 			out.Values[i] = ec._ContainerContainersConnection_edges(ctx, field, obj)
 		default:

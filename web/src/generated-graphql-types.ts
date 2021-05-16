@@ -56,6 +56,7 @@ export type Container = {
 
 export type ContainerContainersConnection = {
   __typename?: 'ContainerContainersConnection';
+  containers: Array<Container>;
   edges?: Maybe<Array<Maybe<ContainerEdge>>>;
 };
 
@@ -313,7 +314,13 @@ export type Container_TreeQuery = (
   & { rootContainers: Array<(
     { __typename?: 'Container' }
     & Pick<Container, 'id' | 'name'>
-    & { items: (
+    & { containers: (
+      { __typename?: 'ContainerContainersConnection' }
+      & { containers: Array<(
+        { __typename?: 'Container' }
+        & Pick<Container, 'id' | 'name'>
+      )> }
+    ), items: (
       { __typename?: 'ContainerItemsConnection' }
       & { items: Array<(
         { __typename?: 'Item' }
@@ -413,6 +420,16 @@ export type PlaceItemToContainerMutation = (
   & { placeItemToContainer: { __typename: 'PlaceItemToContainerResponse' } }
 );
 
+export type PlaceContainerToContainerMutationVariables = Exact<{
+  input: PlaceContainerToContainer;
+}>;
+
+
+export type PlaceContainerToContainerMutation = (
+  { __typename?: 'Mutation' }
+  & { placeContainerToContainer: { __typename: 'PlaceContainerToContainerResponse' } }
+);
+
 
 export const Container_Tree_ContainerDocument = gql`
     query container_tree_container($containerId: ID!) {
@@ -460,6 +477,12 @@ export const Container_TreeDocument = gql`
   rootContainers {
     id
     name
+    containers {
+      containers {
+        id
+        name
+      }
+    }
     items {
       items {
         id
@@ -717,3 +740,36 @@ export function usePlaceItemToContainerMutation(baseOptions?: Apollo.MutationHoo
 export type PlaceItemToContainerMutationHookResult = ReturnType<typeof usePlaceItemToContainerMutation>;
 export type PlaceItemToContainerMutationResult = Apollo.MutationResult<PlaceItemToContainerMutation>;
 export type PlaceItemToContainerMutationOptions = Apollo.BaseMutationOptions<PlaceItemToContainerMutation, PlaceItemToContainerMutationVariables>;
+export const PlaceContainerToContainerDocument = gql`
+    mutation placeContainerToContainer($input: PlaceContainerToContainer!) {
+  placeContainerToContainer(input: $input) {
+    __typename
+  }
+}
+    `;
+export type PlaceContainerToContainerMutationFn = Apollo.MutationFunction<PlaceContainerToContainerMutation, PlaceContainerToContainerMutationVariables>;
+
+/**
+ * __usePlaceContainerToContainerMutation__
+ *
+ * To run a mutation, you first call `usePlaceContainerToContainerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePlaceContainerToContainerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [placeContainerToContainerMutation, { data, loading, error }] = usePlaceContainerToContainerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function usePlaceContainerToContainerMutation(baseOptions?: Apollo.MutationHookOptions<PlaceContainerToContainerMutation, PlaceContainerToContainerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<PlaceContainerToContainerMutation, PlaceContainerToContainerMutationVariables>(PlaceContainerToContainerDocument, options);
+      }
+export type PlaceContainerToContainerMutationHookResult = ReturnType<typeof usePlaceContainerToContainerMutation>;
+export type PlaceContainerToContainerMutationResult = Apollo.MutationResult<PlaceContainerToContainerMutation>;
+export type PlaceContainerToContainerMutationOptions = Apollo.BaseMutationOptions<PlaceContainerToContainerMutation, PlaceContainerToContainerMutationVariables>;

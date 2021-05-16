@@ -12,6 +12,12 @@ gql`
 		rootContainers {
 			id
 			name
+			containers {
+				containers {
+					id
+					name
+				}
+			}
 			items {
 				items {
 					id
@@ -42,6 +48,7 @@ export const ContainerTree = () => {
 					<ContainerTreeContainer
 						name={p.name}
 						containerId={p.id}
+						containers={p.containers.containers}
 						items={p.items.items} />
 				))}
 				{data?.itemsWithoutContainer.map(p => (

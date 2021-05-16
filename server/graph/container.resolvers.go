@@ -23,7 +23,13 @@ func (r *containerResolver) Items(ctx context.Context, obj *models.Container) (*
 }
 
 func (r *containerResolver) Containers(ctx context.Context, obj *models.Container) (*gmodels.ContainerContainersConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+	containers := []*models.Container{}
+
+	r.DB.Where("container_id = ?", obj.ID).Find(&containers)
+
+	return &gmodels.ContainerContainersConnection{
+		Containers: containers,
+	}, nil
 }
 
 func (r *containerResolver) Pictures(ctx context.Context, obj *models.Container) (*gmodels.ContainerPicturesConnection, error) {

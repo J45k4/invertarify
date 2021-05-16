@@ -38,7 +38,8 @@ type ArchiveItemResponse struct {
 }
 
 type ContainerContainersConnection struct {
-	Edges []*ContainerEdge `json:"edges"`
+	Containers []*models.Container `json:"containers"`
+	Edges      []*ContainerEdge    `json:"edges"`
 }
 
 type ContainerEdge struct {

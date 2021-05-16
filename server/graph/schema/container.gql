@@ -13,6 +13,7 @@ type ContainersConnection {
 }
 
 type ContainerContainersConnection {
+	containers: [Container!]!
     edges: [ContainerEdge]
 }
 

@@ -1,10 +1,10 @@
 import gql from "graphql-tag"
 import React, { Fragment } from "react"
-import { useDrop } from "react-dnd"
+import { useDrag, useDrop } from "react-dnd"
 import { usePlaceItemToContainerMutation } from "../generated-graphql-types"
 import { TreelistNode } from "../treelist/treelist-node"
-import { DragItem, DragType } from "../types"
-import { useContainer_Tree_ContainerQuery } from "../generated-graphql-types"
+import { DragContainer, DragEntity, DragItem, DragType } from "../types"
+import { useContainer_Tree_ContainerQuery, usePlaceContainerToContainerMutation } from "../generated-graphql-types"
 import { ContainerTreeItem } from "./container-tree-item"
 
 gql`
@@ -24,36 +24,68 @@ gql`
 export const ContainerTreeContainer = (props: {
 	containerId: string
 	name: string
+	containers: {
+		id: string,
+		name: string
+	}[]
 	items: {
 		id?: string
 		name?: string
 	}[]
 }) => {
 	const [placeItemToContainer] = usePlaceItemToContainerMutation()
+	const [placeToCon] = usePlaceContainerToContainerMutation()
 
 	const [c, ref] = useDrop({
-		accept: DragType.ITEM,
-		drop: (item: DragItem, monitor) => {
-			placeItemToContainer({
-				variables: {
-					input: {
-						containerId: props.containerId,
-						itemId: item.itemId
+		accept: [DragType.ITEM, DragType.CONTAINER],
+		drop: (entity: DragEntity, monitor) => {
+			if (entity.type === "item") {
+				placeItemToContainer({
+					variables: {
+						input: {
+							containerId: props.containerId,
+							itemId: entity.itemId
+						}
 					}
+				})
+			}
+
+			if (entity.type === "container") {
+				if (entity.containerId === props.containerId) {
+					return
 				}
-			})
+
+				placeToCon({
+					variables: {
+					input: {
+						srcContainerId: entity.containerId,
+						dstContainerId: props.containerId
+					}
+					}
+				})
+			}
 		}
+	})
+
+	const [c2, ref2] = useDrag({
+		type: DragType.CONTAINER,
+		item: { type: "container", containerId: props.containerId }
 	})
 
 	return (
 		<div ref={ref}>
-			<TreelistNode name={props.name} showCaret={props.items.length > 0}>
-				<Fragment>
-					{props.items.map(p => (
-						<ContainerTreeItem itemId={p.id} name={p.name} />
+			<div ref={ref2}>
+				<TreelistNode name={props.name} showCaret={props.items.length > 0}>
+					{props.containers.map(p => (
+						<ContainerTreeContainer containerId={p.id} name={p.name} containers={[]} items={[]} />
 					))}
-				</Fragment>
-			</TreelistNode>
+					<Fragment>
+						{props.items.map(p => (
+							<ContainerTreeItem itemId={p.id} name={p.name} />
+						))}
+					</Fragment>
+				</TreelistNode>
+			</div>
 		</div>
 	)
 }

@@ -23,3 +23,9 @@ mutation placeItemToContainer($input: PlaceItemToContainer!) {
 		__typename
 	}
 }
+
+mutation placeContainerToContainer($input: PlaceContainerToContainer!) {
+	placeContainerToContainer(input: $input) {
+		__typename
+	}
+}

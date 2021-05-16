@@ -10,7 +10,7 @@ export const ContainerTreeItem = (props: {
 }) => {
 	const [c, ref] = useDrag({
 		type: DragType.ITEM,
-		item: { itemId: props.itemId }
+		item: { type: "item", itemId: props.itemId }
 	})
 	
 	return (

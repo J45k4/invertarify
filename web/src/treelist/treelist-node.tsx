@@ -27,11 +27,15 @@ export const TreelistNode = (props: {
 						setOpen(false)
 					}} />}
 				</Fragment>}
+				{!props.showCaret &&
+					<span style={{ marginLeft: "15px" }} />}
 				
 				{props.name}
 			</div>
 			{open &&
-			<div>
+			<div style={{
+				marginLeft: "25px"
+			}}>
 				{props.children}
 			</div>}
 		</div>

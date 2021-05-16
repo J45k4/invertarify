@@ -95,7 +95,7 @@ func (r *queryResolver) Picture(ctx context.Context, pictureID string) (*models.
 func (r *queryResolver) RootContainers(ctx context.Context) ([]*models.Container, error) {
 	containers := []*models.Container{}
 
-	r.DB.Find(&containers)
+	r.DB.Where("container_id is null").Find(&containers)
 
 	return containers, nil
 }
