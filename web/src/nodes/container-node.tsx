@@ -3,15 +3,21 @@ import React, { Fragment } from "react"
 import { useDrag, useDrop } from "react-dnd"
 import { usePlaceItemToContainerMutation } from "../generated-graphql-types"
 import { TreelistNode } from "../treelist/treelist-node"
-import { DragContainer, DragEntity, DragItem, DragType } from "../types"
-import { useContainer_Tree_ContainerQuery, usePlaceContainerToContainerMutation } from "../generated-graphql-types"
-import { ContainerTreeItem } from "./container-tree-item"
+import { DragEntity, DragType } from "../types"
+import { usePlaceContainerToContainerMutation, useContainer_NodeQuery} from "../generated-graphql-types"
+import { ItemNode } from "./item-node"
 import Link from "next/link"
 
 gql`
-	query container_tree_container($containerId: ID!) {
+	query container_node($containerId: ID!) {
 		container(containerId: $containerId) {
 			id
+			name
+			containers {
+				containers {
+					id
+				}
+			}
 			items {
 				items {
 					id
@@ -22,20 +28,17 @@ gql`
 	}
 `
 
-export const ContainerTreeContainer = (props: {
+export const ContainerNode = (props: {
 	containerId: string
-	name: string
-	containers: {
-		id?: string,
-		name?: string
-	}[]
-	items: {
-		id?: string
-		name?: string
-	}[]
 }) => {
 	const [placeItemToContainer] = usePlaceItemToContainerMutation()
 	const [placeToCon] = usePlaceContainerToContainerMutation()
+
+	const { data } = useContainer_NodeQuery({
+		variables: {
+			containerId: props.containerId
+		}
+	})
 
 	const [c, ref] = useDrop({
 		accept: [DragType.ITEM, DragType.CONTAINER],
@@ -73,16 +76,22 @@ export const ContainerTreeContainer = (props: {
 		item: { type: "container", containerId: props.containerId }
 	})
 
+	if (!data) {
+		return <div></div>
+	}
+
 	return (
 		<div ref={ref}>
 			<div ref={ref2}>
-				<TreelistNode header={<Link href={`/container/${props.containerId}`}>{props.name}</Link>} showCaret={props.items.length > 0 || props.containers.length > 0}>
-					{props.containers.map(p => (
-						<ContainerTreeContainer containerId={p.id} name={p.name} containers={[]} items={[]} />
+				<TreelistNode 
+					header={<Link href={`/container/${props.containerId}`}>{data?.container?.name}</Link>} 
+					showCaret={data?.container.items.items.length > 0 || data?.container.containers.containers.length > 0}>
+					{data?.container.containers.containers.map(p => (
+						<ContainerNode containerId={p.id} />
 					))}
 					<Fragment>
-						{props.items.map(p => (
-							<ContainerTreeItem itemId={p.id} name={p.name} />
+						{data?.container.items.items.map(p => (
+							<ItemNode itemId={p.id} name={p.name} />
 						))}
 					</Fragment>
 				</TreelistNode>

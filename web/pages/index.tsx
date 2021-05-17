@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Fragment, useState } from 'react'
 import { Button, Card, Container } from 'react-bootstrap'
 import { ContainerList } from '../src/container/container-list'
-import { ContainerTree } from '../src/container/container-tree'
+import { RootNode } from '../src/nodes/root-node'
 import { CreateContainerForm } from '../src/container/create-container-modal'
 import { CreateItemModal } from '../src/create-item-modal'
 import { ItemsList } from '../src/item/items-list'
@@ -40,7 +40,7 @@ export default function Home() {
 						Create container
 					</Button>
 				</div>
-				<ContainerTree />
+				<RootNode />
 
 				<CreateItemModal
 					show={creating}

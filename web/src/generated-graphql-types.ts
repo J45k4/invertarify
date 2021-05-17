@@ -302,53 +302,6 @@ export type UpdateItemResponse = {
 };
 
 
-export type Container_Tree_ContainerQueryVariables = Exact<{
-  containerId: Scalars['ID'];
-}>;
-
-
-export type Container_Tree_ContainerQuery = (
-  { __typename?: 'Query' }
-  & { container?: Maybe<(
-    { __typename?: 'Container' }
-    & Pick<Container, 'id'>
-    & { items: (
-      { __typename?: 'ContainerItemsConnection' }
-      & { items: Array<(
-        { __typename?: 'Item' }
-        & Pick<Item, 'id' | 'name'>
-      )> }
-    ) }
-  )> }
-);
-
-export type Container_TreeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type Container_TreeQuery = (
-  { __typename?: 'Query' }
-  & { rootContainers: Array<(
-    { __typename?: 'Container' }
-    & Pick<Container, 'id' | 'name'>
-    & { containers: (
-      { __typename?: 'ContainerContainersConnection' }
-      & { containers: Array<(
-        { __typename?: 'Container' }
-        & Pick<Container, 'id' | 'name'>
-      )> }
-    ), items: (
-      { __typename?: 'ContainerItemsConnection' }
-      & { items: Array<(
-        { __typename?: 'Item' }
-        & Pick<Item, 'id' | 'name'>
-      )> }
-    ) }
-  )>, itemsWithoutContainer: Array<(
-    { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'name'>
-  )> }
-);
-
 export type Modify_ContainerQueryVariables = Exact<{
   containerId: Scalars['ID'];
 }>;
@@ -475,99 +428,47 @@ export type PlaceContainerToContainerMutation = (
   & { placeContainerToContainer: { __typename: 'PlaceContainerToContainerResponse' } }
 );
 
+export type Container_NodeQueryVariables = Exact<{
+  containerId: Scalars['ID'];
+}>;
 
-export const Container_Tree_ContainerDocument = gql`
-    query container_tree_container($containerId: ID!) {
-  container(containerId: $containerId) {
-    id
-    items {
-      items {
-        id
-        name
-      }
-    }
-  }
-}
-    `;
 
-/**
- * __useContainer_Tree_ContainerQuery__
- *
- * To run a query within a React component, call `useContainer_Tree_ContainerQuery` and pass it any options that fit your needs.
- * When your component renders, `useContainer_Tree_ContainerQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContainer_Tree_ContainerQuery({
- *   variables: {
- *      containerId: // value for 'containerId'
- *   },
- * });
- */
-export function useContainer_Tree_ContainerQuery(baseOptions: Apollo.QueryHookOptions<Container_Tree_ContainerQuery, Container_Tree_ContainerQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<Container_Tree_ContainerQuery, Container_Tree_ContainerQueryVariables>(Container_Tree_ContainerDocument, options);
-      }
-export function useContainer_Tree_ContainerLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Container_Tree_ContainerQuery, Container_Tree_ContainerQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<Container_Tree_ContainerQuery, Container_Tree_ContainerQueryVariables>(Container_Tree_ContainerDocument, options);
-        }
-export type Container_Tree_ContainerQueryHookResult = ReturnType<typeof useContainer_Tree_ContainerQuery>;
-export type Container_Tree_ContainerLazyQueryHookResult = ReturnType<typeof useContainer_Tree_ContainerLazyQuery>;
-export type Container_Tree_ContainerQueryResult = Apollo.QueryResult<Container_Tree_ContainerQuery, Container_Tree_ContainerQueryVariables>;
-export const Container_TreeDocument = gql`
-    query container_tree {
-  rootContainers {
-    id
-    name
-    containers {
-      containers {
-        id
-        name
-      }
-    }
-    items {
-      items {
-        id
-        name
-      }
-    }
-  }
-  itemsWithoutContainer {
-    id
-    name
-  }
-}
-    `;
+export type Container_NodeQuery = (
+  { __typename?: 'Query' }
+  & { container?: Maybe<(
+    { __typename?: 'Container' }
+    & Pick<Container, 'id' | 'name'>
+    & { containers: (
+      { __typename?: 'ContainerContainersConnection' }
+      & { containers: Array<(
+        { __typename?: 'Container' }
+        & Pick<Container, 'id'>
+      )> }
+    ), items: (
+      { __typename?: 'ContainerItemsConnection' }
+      & { items: Array<(
+        { __typename?: 'Item' }
+        & Pick<Item, 'id' | 'name'>
+      )> }
+    ) }
+  )> }
+);
 
-/**
- * __useContainer_TreeQuery__
- *
- * To run a query within a React component, call `useContainer_TreeQuery` and pass it any options that fit your needs.
- * When your component renders, `useContainer_TreeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContainer_TreeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useContainer_TreeQuery(baseOptions?: Apollo.QueryHookOptions<Container_TreeQuery, Container_TreeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<Container_TreeQuery, Container_TreeQueryVariables>(Container_TreeDocument, options);
-      }
-export function useContainer_TreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Container_TreeQuery, Container_TreeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<Container_TreeQuery, Container_TreeQueryVariables>(Container_TreeDocument, options);
-        }
-export type Container_TreeQueryHookResult = ReturnType<typeof useContainer_TreeQuery>;
-export type Container_TreeLazyQueryHookResult = ReturnType<typeof useContainer_TreeLazyQuery>;
-export type Container_TreeQueryResult = Apollo.QueryResult<Container_TreeQuery, Container_TreeQueryVariables>;
+export type Container_TreeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type Container_TreeQuery = (
+  { __typename?: 'Query' }
+  & { rootContainers: Array<(
+    { __typename?: 'Container' }
+    & Pick<Container, 'id'>
+  )>, itemsWithoutContainer: Array<(
+    { __typename?: 'Item' }
+    & Pick<Item, 'id' | 'name'>
+  )> }
+);
+
+
 export const Modify_ContainerDocument = gql`
     query modify_container($containerId: ID!) {
   container(containerId: $containerId) {
@@ -890,3 +791,88 @@ export function usePlaceContainerToContainerMutation(baseOptions?: Apollo.Mutati
 export type PlaceContainerToContainerMutationHookResult = ReturnType<typeof usePlaceContainerToContainerMutation>;
 export type PlaceContainerToContainerMutationResult = Apollo.MutationResult<PlaceContainerToContainerMutation>;
 export type PlaceContainerToContainerMutationOptions = Apollo.BaseMutationOptions<PlaceContainerToContainerMutation, PlaceContainerToContainerMutationVariables>;
+export const Container_NodeDocument = gql`
+    query container_node($containerId: ID!) {
+  container(containerId: $containerId) {
+    id
+    name
+    containers {
+      containers {
+        id
+      }
+    }
+    items {
+      items {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useContainer_NodeQuery__
+ *
+ * To run a query within a React component, call `useContainer_NodeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContainer_NodeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContainer_NodeQuery({
+ *   variables: {
+ *      containerId: // value for 'containerId'
+ *   },
+ * });
+ */
+export function useContainer_NodeQuery(baseOptions: Apollo.QueryHookOptions<Container_NodeQuery, Container_NodeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Container_NodeQuery, Container_NodeQueryVariables>(Container_NodeDocument, options);
+      }
+export function useContainer_NodeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Container_NodeQuery, Container_NodeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Container_NodeQuery, Container_NodeQueryVariables>(Container_NodeDocument, options);
+        }
+export type Container_NodeQueryHookResult = ReturnType<typeof useContainer_NodeQuery>;
+export type Container_NodeLazyQueryHookResult = ReturnType<typeof useContainer_NodeLazyQuery>;
+export type Container_NodeQueryResult = Apollo.QueryResult<Container_NodeQuery, Container_NodeQueryVariables>;
+export const Container_TreeDocument = gql`
+    query container_tree {
+  rootContainers {
+    id
+  }
+  itemsWithoutContainer {
+    id
+    name
+  }
+}
+    `;
+
+/**
+ * __useContainer_TreeQuery__
+ *
+ * To run a query within a React component, call `useContainer_TreeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContainer_TreeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContainer_TreeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useContainer_TreeQuery(baseOptions?: Apollo.QueryHookOptions<Container_TreeQuery, Container_TreeQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Container_TreeQuery, Container_TreeQueryVariables>(Container_TreeDocument, options);
+      }
+export function useContainer_TreeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Container_TreeQuery, Container_TreeQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Container_TreeQuery, Container_TreeQueryVariables>(Container_TreeDocument, options);
+        }
+export type Container_TreeQueryHookResult = ReturnType<typeof useContainer_TreeQuery>;
+export type Container_TreeLazyQueryHookResult = ReturnType<typeof useContainer_TreeLazyQuery>;
+export type Container_TreeQueryResult = Apollo.QueryResult<Container_TreeQuery, Container_TreeQueryVariables>;

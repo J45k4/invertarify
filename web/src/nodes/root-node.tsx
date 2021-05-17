@@ -4,26 +4,13 @@ import React from "react"
 import { Card } from "react-bootstrap"
 import { useContainer_TreeQuery } from "../generated-graphql-types"
 import { TreelistNode } from "../treelist/treelist-node"
-import { ContainerTreeContainer } from "./container-tree-container"
-import { ContainerTreeItem } from "./container-tree-item"
+import { ContainerNode } from "./container-node"
+import { ItemNode } from "./item-node"
 
 gql`
 	query container_tree {
 		rootContainers {
 			id
-			name
-			containers {
-				containers {
-					id
-					name
-				}
-			}
-			items {
-				items {
-					id
-					name
-				}
-			}
 		}
 		itemsWithoutContainer {
 			id
@@ -32,7 +19,7 @@ gql`
 	}
 `
 
-export const ContainerTree = () => {
+export const RootNode = () => {
 	const {data, error} = useContainer_TreeQuery()
 
 	if (error) {
@@ -45,15 +32,11 @@ export const ContainerTree = () => {
 		<Card>
 			<Card.Body>
 				{data?.rootContainers.map(p => (
-					<ContainerTreeContainer
-						name={p.name}
-						containerId={p.id}
-						containers={p.containers.containers}
-						items={p.items.items} />
+					<ContainerNode containerId={p.id} />
 				))}
 				{data?.itemsWithoutContainer.map(p => (
 					<div key={p.id}>
-						<ContainerTreeItem itemId={p.id} name={p.name} />
+						<ItemNode itemId={p.id} name={p.name} />
 					</div>
 				))}
 			</Card.Body>

@@ -4,7 +4,7 @@ import React from "react"
 import { useDrag } from "react-dnd"
 import { DragType } from "../types"
 
-export const ContainerTreeItem = (props: {
+export const ItemNode = (props: {
 	itemId: string
 	name: string
 }) => {
