@@ -75,7 +75,7 @@ export const ContainerTreeContainer = (props: {
 	return (
 		<div ref={ref}>
 			<div ref={ref2}>
-				<TreelistNode name={props.name} showCaret={props.items.length > 0}>
+				<TreelistNode name={props.name} showCaret={props.items.length > 0 || props.containers.length > 0}>
 					{props.containers.map(p => (
 						<ContainerTreeContainer containerId={p.id} name={p.name} containers={[]} items={[]} />
 					))}
