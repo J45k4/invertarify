@@ -71,3 +71,12 @@ input ArchiveContainer {
 type ArchiveContainerResponse {
     error: Error
 }
+
+input UpdateContainer {
+	containerId: ID!
+	name: String
+}
+
+type UpdateContainerRespose {
+	container: Container
+}

@@ -131,6 +131,15 @@ type PlaceItemToContainerResponse struct {
 	Error *Error `json:"error"`
 }
 
+type UpdateContainer struct {
+	ContainerID string  `json:"containerId"`
+	Name        *string `json:"name"`
+}
+
+type UpdateContainerRespose struct {
+	Container *models.Container `json:"container"`
+}
+
 type UpdateItem struct {
 	ItemID      string  `json:"itemId"`
 	ContainerID *string `json:"containerId"`

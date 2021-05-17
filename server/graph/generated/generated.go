@@ -129,6 +129,7 @@ type ComplexityRoot struct {
 		CreateItem                func(childComplexity int, input gmodels.CreateItem) int
 		PlaceContainerToContainer func(childComplexity int, input gmodels.PlaceContainerToContainer) int
 		PlaceItemToContainer      func(childComplexity int, input gmodels.PlaceItemToContainer) int
+		UpdateContainer           func(childComplexity int, input gmodels.UpdateContainer) int
 		UpdateItem                func(childComplexity int, input gmodels.UpdateItem) int
 	}
 
@@ -159,6 +160,10 @@ type ComplexityRoot struct {
 		RootContainers        func(childComplexity int) int
 	}
 
+	UpdateContainerRespose struct {
+		Container func(childComplexity int) int
+	}
+
 	UpdateItemResponse struct {
 		Item func(childComplexity int) int
 	}
@@ -180,6 +185,7 @@ type MutationResolver interface {
 	UpdateItem(ctx context.Context, input gmodels.UpdateItem) (*gmodels.UpdateItemResponse, error)
 	AddPictureForItem(ctx context.Context, input gmodels.AddPictureForItem) (*gmodels.AddPictureForItemResponse, error)
 	CreateContainer(ctx context.Context, input gmodels.CreateContainer) (*gmodels.CreateContainerResponse, error)
+	UpdateContainer(ctx context.Context, input gmodels.UpdateContainer) (*gmodels.UpdateContainerRespose, error)
 	PlaceItemToContainer(ctx context.Context, input gmodels.PlaceItemToContainer) (*gmodels.PlaceItemToContainerResponse, error)
 	PlaceContainerToContainer(ctx context.Context, input gmodels.PlaceContainerToContainer) (*gmodels.PlaceContainerToContainerResponse, error)
 	ArchiveItem(ctx context.Context, input gmodels.ArchiveItem) (*gmodels.ArchiveItemResponse, error)
@@ -500,6 +506,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.PlaceItemToContainer(childComplexity, args["input"].(gmodels.PlaceItemToContainer)), true
 
+	case "Mutation.updateContainer":
+		if e.complexity.Mutation.UpdateContainer == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateContainer_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateContainer(childComplexity, args["input"].(gmodels.UpdateContainer)), true
+
 	case "Mutation.updateItem":
 		if e.complexity.Mutation.UpdateItem == nil {
 			break
@@ -620,6 +638,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.RootContainers(childComplexity), true
+
+	case "UpdateContainerRespose.container":
+		if e.complexity.UpdateContainerRespose.Container == nil {
+			break
+		}
+
+		return e.complexity.UpdateContainerRespose.Container(childComplexity), true
 
 	case "UpdateItemResponse.item":
 		if e.complexity.UpdateItemResponse.Item == nil {
@@ -775,6 +800,15 @@ input ArchiveContainer {
 
 type ArchiveContainerResponse {
     error: Error
+}
+
+input UpdateContainer {
+	containerId: ID!
+	name: String
+}
+
+type UpdateContainerRespose {
+	container: Container
 }`, BuiltIn: false},
 	{Name: "graph/schema/error.gql", Input: `
 type Error {
@@ -854,6 +888,7 @@ type Mutation {
 	updateItem(input: UpdateItem!): UpdateItemResponse!
     addPictureForItem(input: AddPictureForItem!): AddPictureForItemResponse!
     createContainer(input: CreateContainer!): CreateContainerResponse!
+	updateContainer(input: UpdateContainer!): UpdateContainerRespose!
     placeItemToContainer(input: PlaceItemToContainer!): PlaceItemToContainerResponse!
     placeContainerToContainer(input: PlaceContainerToContainer!): PlaceContainerToContainerResponse!
     archiveItem(input: ArchiveItem!): ArchiveItemResponse!
@@ -991,6 +1026,21 @@ func (ec *executionContext) field_Mutation_placeItemToContainer_args(ctx context
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNPlaceItemToContainer2githubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPlaceItemToContainer(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateContainer_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 gmodels.UpdateContainer
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateContainer2githubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐUpdateContainer(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2274,6 +2324,48 @@ func (ec *executionContext) _Mutation_createContainer(ctx context.Context, field
 	return ec.marshalNCreateContainerResponse2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐCreateContainerResponse(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_updateContainer(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateContainer_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateContainer(rctx, args["input"].(gmodels.UpdateContainer))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*gmodels.UpdateContainerRespose)
+	fc.Result = res
+	return ec.marshalNUpdateContainerRespose2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐUpdateContainerRespose(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_placeItemToContainer(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2948,6 +3040,38 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	res := resTmp.(*introspection.Schema)
 	fc.Result = res
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UpdateContainerRespose_container(ctx context.Context, field graphql.CollectedField, obj *gmodels.UpdateContainerRespose) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UpdateContainerRespose",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Container, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Container)
+	fc.Result = res
+	return ec.marshalOContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UpdateItemResponse_item(ctx context.Context, field graphql.CollectedField, obj *gmodels.UpdateItemResponse) (ret graphql.Marshaler) {
@@ -4368,6 +4492,34 @@ func (ec *executionContext) unmarshalInputPlaceItemToContainer(ctx context.Conte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateContainer(ctx context.Context, obj interface{}) (gmodels.UpdateContainer, error) {
+	var it gmodels.UpdateContainer
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "containerId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("containerId"))
+			it.ContainerID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateItem(ctx context.Context, obj interface{}) (gmodels.UpdateItem, error) {
 	var it gmodels.UpdateItem
 	var asMap = obj.(map[string]interface{})
@@ -4933,6 +5085,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateContainer":
+			out.Values[i] = ec._Mutation_updateContainer(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "placeItemToContainer":
 			out.Values[i] = ec._Mutation_placeItemToContainer(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -5185,6 +5342,30 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
 			out.Values[i] = ec._Query___schema(ctx, field)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var updateContainerResposeImplementors = []string{"UpdateContainerRespose"}
+
+func (ec *executionContext) _UpdateContainerRespose(ctx context.Context, sel ast.SelectionSet, obj *gmodels.UpdateContainerRespose) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, updateContainerResposeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UpdateContainerRespose")
+		case "container":
+			out.Values[i] = ec._UpdateContainerRespose_container(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5842,6 +6023,25 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateContainer2githubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐUpdateContainer(ctx context.Context, v interface{}) (gmodels.UpdateContainer, error) {
+	res, err := ec.unmarshalInputUpdateContainer(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateContainerRespose2githubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐUpdateContainerRespose(ctx context.Context, sel ast.SelectionSet, v gmodels.UpdateContainerRespose) graphql.Marshaler {
+	return ec._UpdateContainerRespose(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUpdateContainerRespose2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐUpdateContainerRespose(ctx context.Context, sel ast.SelectionSet, v *gmodels.UpdateContainerRespose) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateContainerRespose(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpdateItem2githubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐUpdateItem(ctx context.Context, v interface{}) (gmodels.UpdateItem, error) {

@@ -4,6 +4,7 @@ type Mutation {
 	updateItem(input: UpdateItem!): UpdateItemResponse!
     addPictureForItem(input: AddPictureForItem!): AddPictureForItemResponse!
     createContainer(input: CreateContainer!): CreateContainerResponse!
+	updateContainer(input: UpdateContainer!): UpdateContainerRespose!
     placeItemToContainer(input: PlaceItemToContainer!): PlaceItemToContainerResponse!
     placeContainerToContainer(input: PlaceContainerToContainer!): PlaceContainerToContainerResponse!
     archiveItem(input: ArchiveItem!): ArchiveItemResponse!

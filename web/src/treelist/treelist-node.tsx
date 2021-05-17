@@ -3,7 +3,7 @@ import React, { Fragment, useState } from "react"
 import { FaCaretRight, FaCaretDown } from "react-icons/fa"
 
 export const TreelistNode = (props: {
-	name: string
+	header: any
 	showCaret: boolean
 	children?: any
 }) => {
@@ -30,7 +30,7 @@ export const TreelistNode = (props: {
 				{!props.showCaret &&
 					<span style={{ marginLeft: "15px" }} />}
 				
-				{props.name}
+				{props.header}
 			</div>
 			{open &&
 			<div style={{

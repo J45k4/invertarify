@@ -18,6 +18,15 @@ mutation createContainer($input: CreateContainer!) {
 	}
 }
 
+mutation updateContainer($input: UpdateContainer!) {
+	updateContainer(input: $input) {
+		container {
+			id
+			name
+		}
+	}
+}
+
 mutation placeItemToContainer($input: PlaceItemToContainer!) {
 	placeItemToContainer(input: $input) {
 		__typename

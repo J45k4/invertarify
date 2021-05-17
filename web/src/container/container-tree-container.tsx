@@ -6,6 +6,7 @@ import { TreelistNode } from "../treelist/treelist-node"
 import { DragContainer, DragEntity, DragItem, DragType } from "../types"
 import { useContainer_Tree_ContainerQuery, usePlaceContainerToContainerMutation } from "../generated-graphql-types"
 import { ContainerTreeItem } from "./container-tree-item"
+import Link from "next/link"
 
 gql`
 	query container_tree_container($containerId: ID!) {
@@ -75,7 +76,7 @@ export const ContainerTreeContainer = (props: {
 	return (
 		<div ref={ref}>
 			<div ref={ref2}>
-				<TreelistNode name={props.name} showCaret={props.items.length > 0 || props.containers.length > 0}>
+				<TreelistNode header={<Link href={`/container/${props.containerId}`}>{props.name}</Link>} showCaret={props.items.length > 0 || props.containers.length > 0}>
 					{props.containers.map(p => (
 						<ContainerTreeContainer containerId={p.id} name={p.name} containers={[]} items={[]} />
 					))}

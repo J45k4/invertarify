@@ -53,7 +53,7 @@ func (r *queryResolver) Items(ctx context.Context, input gmodels.Items) (*gmodel
 func (r *queryResolver) Container(ctx context.Context, containerID string) (*models.Container, error) {
 	container := models.Container{}
 
-	r.DB.Find(&container)
+	r.DB.Find(&container, containerID)
 
 	return &container, nil
 }

@@ -56,6 +56,26 @@ func (r *mutationResolver) CreateContainer(ctx context.Context, input gmodels.Cr
 	}, nil
 }
 
+func (r *mutationResolver) UpdateContainer(ctx context.Context, input gmodels.UpdateContainer) (*gmodels.UpdateContainerRespose, error) {
+	container := models.Container{}
+
+	r.DB.Find(&container, input.ContainerID)
+
+	if container.ID == 0 {
+		return &gmodels.UpdateContainerRespose{}, nil
+	}
+
+	if input.Name != nil {
+		container.Name = *input.Name
+	}
+
+	r.DB.Save(&container)
+
+	return &gmodels.UpdateContainerRespose{
+		Container: &container,
+	}, nil
+}
+
 func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmodels.PlaceItemToContainer) (*gmodels.PlaceItemToContainerResponse, error) {
 	item := models.Item{}
 
