@@ -48,6 +48,14 @@ const isChanged = (a, b) => {
 		return true
 	}
 
+	if (a === null || b === null) {
+		if (a === null && b === null) {
+			return false
+		}
+
+		return true
+	}
+
 	if (aType === "object") {
 		const aPropsLen = Object.keys(a).length
 		const bPropsLen = Object.keys(b).length
