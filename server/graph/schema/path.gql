@@ -1,0 +1,4 @@
+type PathPart {
+	id: ID!
+	name: String
+}

@@ -108,6 +108,11 @@ type ItemsConnection struct {
 	Items []*models.Item `json:"items"`
 }
 
+type PathPart struct {
+	ID   string  `json:"id"`
+	Name *string `json:"name"`
+}
+
 type PictureEdge struct {
 	Cursor string          `json:"cursor"`
 	Node   *models.Picture `json:"node"`

@@ -64,6 +64,7 @@ type ComplexityRoot struct {
 		ID                 func(childComplexity int) int
 		Items              func(childComplexity int) int
 		Name               func(childComplexity int) int
+		PathParts          func(childComplexity int) int
 		Pictures           func(childComplexity int) int
 		PossibleItemsToAdd func(childComplexity int) int
 	}
@@ -106,11 +107,12 @@ type ComplexityRoot struct {
 	}
 
 	Item struct {
-		Barcode  func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Metadata func(childComplexity int) int
-		Name     func(childComplexity int) int
-		Pictures func(childComplexity int) int
+		Barcode   func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Metadata  func(childComplexity int) int
+		Name      func(childComplexity int) int
+		PathParts func(childComplexity int) int
+		Pictures  func(childComplexity int) int
 	}
 
 	ItemPicturesConnection struct {
@@ -131,6 +133,11 @@ type ComplexityRoot struct {
 		PlaceItemToContainer      func(childComplexity int, input gmodels.PlaceItemToContainer) int
 		UpdateContainer           func(childComplexity int, input gmodels.UpdateContainer) int
 		UpdateItem                func(childComplexity int, input gmodels.UpdateItem) int
+	}
+
+	PathPart struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
 	}
 
 	Picture struct {
@@ -170,6 +177,7 @@ type ComplexityRoot struct {
 }
 
 type ContainerResolver interface {
+	PathParts(ctx context.Context, obj *models.Container) ([]*gmodels.PathPart, error)
 	Items(ctx context.Context, obj *models.Container) (*gmodels.ContainerItemsConnection, error)
 	Containers(ctx context.Context, obj *models.Container) (*gmodels.ContainerContainersConnection, error)
 	Pictures(ctx context.Context, obj *models.Container) (*gmodels.ContainerPicturesConnection, error)
@@ -178,6 +186,7 @@ type ContainerResolver interface {
 type ItemResolver interface {
 	ID(ctx context.Context, obj *models.Item) (string, error)
 
+	PathParts(ctx context.Context, obj *models.Item) ([]*gmodels.PathPart, error)
 	Pictures(ctx context.Context, obj *models.Item) (*gmodels.ItemPicturesConnection, error)
 }
 type MutationResolver interface {
@@ -267,6 +276,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Container.Name(childComplexity), true
+
+	case "Container.pathParts":
+		if e.complexity.Container.PathParts == nil {
+			break
+		}
+
+		return e.complexity.Container.PathParts(childComplexity), true
 
 	case "Container.pictures":
 		if e.complexity.Container.Pictures == nil {
@@ -401,6 +417,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Name(childComplexity), true
 
+	case "Item.pathParts":
+		if e.complexity.Item.PathParts == nil {
+			break
+		}
+
+		return e.complexity.Item.PathParts(childComplexity), true
+
 	case "Item.pictures":
 		if e.complexity.Item.Pictures == nil {
 			break
@@ -529,6 +552,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateItem(childComplexity, args["input"].(gmodels.UpdateItem)), true
+
+	case "PathPart.id":
+		if e.complexity.PathPart.ID == nil {
+			break
+		}
+
+		return e.complexity.PathPart.ID(childComplexity), true
+
+	case "PathPart.name":
+		if e.complexity.PathPart.Name == nil {
+			break
+		}
+
+		return e.complexity.PathPart.Name(childComplexity), true
 
 	case "Picture.id":
 		if e.complexity.Picture.ID == nil {
@@ -732,6 +769,7 @@ var sources = []*ast.Source{
 type Container {
     id: ID!
     name: String
+	pathParts: [PathPart!]!
     items: ContainerItemsConnection!
     containers: ContainerContainersConnection!
     pictures: ContainerPicturesConnection!
@@ -820,6 +858,7 @@ type Error {
     name: String
 	metadata: String
     barcode: String
+	pathParts: [PathPart!]!
     pictures: ItemPicturesConnection!
 }
 
@@ -893,6 +932,10 @@ type Mutation {
     placeContainerToContainer(input: PlaceContainerToContainer!): PlaceContainerToContainerResponse!
     archiveItem(input: ArchiveItem!): ArchiveItemResponse!
     archiveContainer(input: ArchiveContainer!): ArchiveContainerResponse!
+}`, BuiltIn: false},
+	{Name: "graph/schema/path.gql", Input: `type PathPart {
+	id: ID!
+	name: String
 }`, BuiltIn: false},
 	{Name: "graph/schema/picture.gql", Input: `
 type Picture {
@@ -1353,6 +1396,41 @@ func (ec *executionContext) _Container_name(ctx context.Context, field graphql.C
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Container_pathParts(ctx context.Context, field graphql.CollectedField, obj *models.Container) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Container",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Container().PathParts(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gmodels.PathPart)
+	fc.Result = res
+	return ec.marshalNPathPart2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPathPartᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Container_items(ctx context.Context, field graphql.CollectedField, obj *models.Container) (ret graphql.Marshaler) {
@@ -2054,6 +2132,41 @@ func (ec *executionContext) _Item_barcode(ctx context.Context, field graphql.Col
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Item_pathParts(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Item().PathParts(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*gmodels.PathPart)
+	fc.Result = res
+	return ec.marshalNPathPart2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPathPartᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Item_pictures(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2532,6 +2645,73 @@ func (ec *executionContext) _Mutation_archiveContainer(ctx context.Context, fiel
 	res := resTmp.(*gmodels.ArchiveContainerResponse)
 	fc.Result = res
 	return ec.marshalNArchiveContainerResponse2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐArchiveContainerResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PathPart_id(ctx context.Context, field graphql.CollectedField, obj *gmodels.PathPart) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PathPart",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PathPart_name(ctx context.Context, field graphql.CollectedField, obj *gmodels.PathPart) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PathPart",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Picture_id(ctx context.Context, field graphql.CollectedField, obj *models.Picture) (ret graphql.Marshaler) {
@@ -4662,6 +4842,20 @@ func (ec *executionContext) _Container(ctx context.Context, sel ast.SelectionSet
 			}
 		case "name":
 			out.Values[i] = ec._Container_name(ctx, field, obj)
+		case "pathParts":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Container_pathParts(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "items":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -4974,6 +5168,20 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Item_metadata(ctx, field, obj)
 		case "barcode":
 			out.Values[i] = ec._Item_barcode(ctx, field, obj)
+		case "pathParts":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Item_pathParts(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "pictures":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5110,6 +5318,35 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var pathPartImplementors = []string{"PathPart"}
+
+func (ec *executionContext) _PathPart(ctx context.Context, sel ast.SelectionSet, obj *gmodels.PathPart) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pathPartImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PathPart")
+		case "id":
+			out.Values[i] = ec._PathPart_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._PathPart_name(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5970,6 +6207,53 @@ func (ec *executionContext) marshalNItemsConnection2ᚖgithubᚗcomᚋj45k4ᚋin
 		return graphql.Null
 	}
 	return ec._ItemsConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPathPart2ᚕᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPathPartᚄ(ctx context.Context, sel ast.SelectionSet, v []*gmodels.PathPart) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPathPart2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPathPart(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNPathPart2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPathPart(ctx context.Context, sel ast.SelectionSet, v *gmodels.PathPart) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PathPart(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPlaceContainerToContainer2githubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐPlaceContainerToContainer(ctx context.Context, v interface{}) (gmodels.PlaceContainerToContainer, error) {

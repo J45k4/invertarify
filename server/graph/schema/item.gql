@@ -3,6 +3,7 @@ type Item {
     name: String
 	metadata: String
     barcode: String
+	pathParts: [PathPart!]!
     pictures: ItemPicturesConnection!
 }
 

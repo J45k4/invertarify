@@ -1,5 +1,6 @@
 import React, { Fragment } from "react"
-import { Card, Col, Container, Row } from "react-bootstrap"
+import { Col, Container, Row } from "react-bootstrap"
+import { ItemPath } from "../../src/entity-path"
 import { ItemImages } from "../../src/item/item-imgaes"
 import { ModifyItemForm } from "../../src/item/modify-item-form"
 import { NavigationBar } from "../../src/navigationbar"
@@ -10,7 +11,15 @@ export default function ItemPage() {
 
     return <Fragment>
 		<NavigationBar />
-        <Container>
+		<Container fluid={true}>
+			{itemId &&
+				<div style={{
+					marginBottom: "10px"
+				}}>
+					<ItemPath itemId={itemId} />
+				</div>}
+		</Container>
+        <Container>	
 			<Row>
 				<Col>
 					{itemId && 

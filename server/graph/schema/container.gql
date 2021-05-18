@@ -2,6 +2,7 @@
 type Container {
     id: ID!
     name: String
+	pathParts: [PathPart!]!
     items: ContainerItemsConnection!
     containers: ContainerContainersConnection!
     pictures: ContainerPicturesConnection!

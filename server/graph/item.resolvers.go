@@ -16,6 +16,40 @@ func (r *itemResolver) ID(ctx context.Context, obj *models.Item) (string, error)
 	return fmt.Sprint(obj.ID), nil
 }
 
+func (r *itemResolver) PathParts(ctx context.Context, obj *models.Item) ([]*gmodels.PathPart, error) {
+	pathParts := []*gmodels.PathPart{}
+
+	if obj.ContainerID != nil {
+		id := int(*obj.ContainerID)
+		parentContainerId := &id
+
+		for {
+			if parentContainerId == nil {
+				break
+			}
+
+			container := models.Container{}
+
+			r.DB.Find(&container, parentContainerId)
+
+			if container.ID == 0 {
+				break
+			}
+
+			pathParts = append([]*gmodels.PathPart{
+				{
+					ID:   fmt.Sprint(container.ID),
+					Name: &container.Name,
+				},
+			}, pathParts...)
+
+			parentContainerId = container.ContainerID
+		}
+	}
+
+	return pathParts, nil
+}
+
 func (r *itemResolver) Pictures(ctx context.Context, obj *models.Item) (*gmodels.ItemPicturesConnection, error) {
 	panic(fmt.Errorf("not implemented"))
 }

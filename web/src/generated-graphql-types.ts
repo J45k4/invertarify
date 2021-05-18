@@ -48,6 +48,7 @@ export type Container = {
   __typename?: 'Container';
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
+  pathParts: Array<PathPart>;
   items: ContainerItemsConnection;
   containers: ContainerContainersConnection;
   pictures: ContainerPicturesConnection;
@@ -129,6 +130,7 @@ export type Item = {
   name?: Maybe<Scalars['String']>;
   metadata?: Maybe<Scalars['String']>;
   barcode?: Maybe<Scalars['String']>;
+  pathParts: Array<PathPart>;
   pictures: ItemPicturesConnection;
 };
 
@@ -210,6 +212,12 @@ export type MutationArchiveItemArgs = {
 
 export type MutationArchiveContainerArgs = {
   input: ArchiveContainer;
+};
+
+export type PathPart = {
+  __typename?: 'PathPart';
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
 };
 
 export type Picture = {
@@ -329,6 +337,40 @@ export type CreateItemMutation = (
       & Pick<Item, 'id' | 'name'>
     )> }
   ) }
+);
+
+export type Item_PathQueryVariables = Exact<{
+  itemId: Scalars['ID'];
+}>;
+
+
+export type Item_PathQuery = (
+  { __typename?: 'Query' }
+  & { item?: Maybe<(
+    { __typename?: 'Item' }
+    & Pick<Item, 'id'>
+    & { pathParts: Array<(
+      { __typename?: 'PathPart' }
+      & Pick<PathPart, 'id' | 'name'>
+    )> }
+  )> }
+);
+
+export type Container_PathQueryVariables = Exact<{
+  containerId: Scalars['ID'];
+}>;
+
+
+export type Container_PathQuery = (
+  { __typename?: 'Query' }
+  & { container?: Maybe<(
+    { __typename?: 'Container' }
+    & Pick<Container, 'id'>
+    & { pathParts: Array<(
+      { __typename?: 'PathPart' }
+      & Pick<PathPart, 'id' | 'name'>
+    )> }
+  )> }
 );
 
 export type Modify_Item_FormQueryVariables = Exact<{
@@ -541,6 +583,84 @@ export function useCreateItemMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateItemMutationHookResult = ReturnType<typeof useCreateItemMutation>;
 export type CreateItemMutationResult = Apollo.MutationResult<CreateItemMutation>;
 export type CreateItemMutationOptions = Apollo.BaseMutationOptions<CreateItemMutation, CreateItemMutationVariables>;
+export const Item_PathDocument = gql`
+    query item_path($itemId: ID!) {
+  item(itemId: $itemId) {
+    id
+    pathParts {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useItem_PathQuery__
+ *
+ * To run a query within a React component, call `useItem_PathQuery` and pass it any options that fit your needs.
+ * When your component renders, `useItem_PathQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useItem_PathQuery({
+ *   variables: {
+ *      itemId: // value for 'itemId'
+ *   },
+ * });
+ */
+export function useItem_PathQuery(baseOptions: Apollo.QueryHookOptions<Item_PathQuery, Item_PathQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Item_PathQuery, Item_PathQueryVariables>(Item_PathDocument, options);
+      }
+export function useItem_PathLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Item_PathQuery, Item_PathQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Item_PathQuery, Item_PathQueryVariables>(Item_PathDocument, options);
+        }
+export type Item_PathQueryHookResult = ReturnType<typeof useItem_PathQuery>;
+export type Item_PathLazyQueryHookResult = ReturnType<typeof useItem_PathLazyQuery>;
+export type Item_PathQueryResult = Apollo.QueryResult<Item_PathQuery, Item_PathQueryVariables>;
+export const Container_PathDocument = gql`
+    query container_path($containerId: ID!) {
+  container(containerId: $containerId) {
+    id
+    pathParts {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useContainer_PathQuery__
+ *
+ * To run a query within a React component, call `useContainer_PathQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContainer_PathQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useContainer_PathQuery({
+ *   variables: {
+ *      containerId: // value for 'containerId'
+ *   },
+ * });
+ */
+export function useContainer_PathQuery(baseOptions: Apollo.QueryHookOptions<Container_PathQuery, Container_PathQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Container_PathQuery, Container_PathQueryVariables>(Container_PathDocument, options);
+      }
+export function useContainer_PathLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Container_PathQuery, Container_PathQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Container_PathQuery, Container_PathQueryVariables>(Container_PathDocument, options);
+        }
+export type Container_PathQueryHookResult = ReturnType<typeof useContainer_PathQuery>;
+export type Container_PathLazyQueryHookResult = ReturnType<typeof useContainer_PathLazyQuery>;
+export type Container_PathQueryResult = Apollo.QueryResult<Container_PathQuery, Container_PathQueryVariables>;
 export const Modify_Item_FormDocument = gql`
     query modify_item_form($itemId: ID!) {
   item(itemId: $itemId) {

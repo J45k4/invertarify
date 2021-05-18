@@ -12,6 +12,40 @@ import (
 	"github.com/j45k4/invertarify/models"
 )
 
+func (r *containerResolver) PathParts(ctx context.Context, obj *models.Container) ([]*gmodels.PathPart, error) {
+	pathParts := []*gmodels.PathPart{}
+
+	if obj.ContainerID != nil {
+		id := int(*obj.ContainerID)
+		parentContainerId := &id
+
+		for {
+			if parentContainerId == nil {
+				break
+			}
+
+			container := models.Container{}
+
+			r.DB.Find(&container, parentContainerId)
+
+			if container.ID == 0 {
+				break
+			}
+
+			pathParts = append([]*gmodels.PathPart{
+				{
+					ID:   fmt.Sprint(container.ID),
+					Name: &container.Name,
+				},
+			}, pathParts...)
+
+			parentContainerId = container.ContainerID
+		}
+	}
+
+	return pathParts, nil
+}
+
 func (r *containerResolver) Items(ctx context.Context, obj *models.Container) (*gmodels.ContainerItemsConnection, error) {
 	items := []*models.Item{}
 

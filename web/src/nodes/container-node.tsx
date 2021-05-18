@@ -85,7 +85,7 @@ export const ContainerNode = (props: {
 			<div ref={ref2}>
 				<TreelistNode 
 					header={<Link href={`/container/${props.containerId}`}>{data?.container?.name}</Link>} 
-					showCaret={data?.container.items.items.length > 0 || data?.container.containers.containers.length > 0}>
+					showCaret={true}>
 					{data?.container.containers.containers.map(p => (
 						<ContainerNode containerId={p.id} />
 					))}
