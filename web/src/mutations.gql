@@ -29,12 +29,34 @@ mutation updateContainer($input: UpdateContainer!) {
 
 mutation placeItemToContainer($input: PlaceItemToContainer!) {
 	placeItemToContainer(input: $input) {
-		__typename
+		container {
+			id
+			name
+		}
+		item {
+			id
+			name
+		}
+		previousContainer {
+			id
+			name
+		}
 	}
 }
 
 mutation placeContainerToContainer($input: PlaceContainerToContainer!) {
 	placeContainerToContainer(input: $input) {
-		__typename
+		srcContainer {
+			id
+			name
+		}
+		dstContainer {
+			id
+			name
+		}
+		previousContainer {
+			id
+			name
+		}
 	}
 }

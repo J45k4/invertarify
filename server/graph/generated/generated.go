@@ -150,11 +150,15 @@ type ComplexityRoot struct {
 	}
 
 	PlaceContainerToContainerResponse struct {
-		Error func(childComplexity int) int
+		DstContainer      func(childComplexity int) int
+		PreviousContainer func(childComplexity int) int
+		SrcContainer      func(childComplexity int) int
 	}
 
 	PlaceItemToContainerResponse struct {
-		Error func(childComplexity int) int
+		Container         func(childComplexity int) int
+		Item              func(childComplexity int) int
+		PreviousContainer func(childComplexity int) int
 	}
 
 	Query struct {
@@ -184,8 +188,6 @@ type ContainerResolver interface {
 	PossibleItemsToAdd(ctx context.Context, obj *models.Container) ([]*models.Item, error)
 }
 type ItemResolver interface {
-	ID(ctx context.Context, obj *models.Item) (string, error)
-
 	PathParts(ctx context.Context, obj *models.Item) ([]*gmodels.PathPart, error)
 	Pictures(ctx context.Context, obj *models.Item) (*gmodels.ItemPicturesConnection, error)
 }
@@ -588,19 +590,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PictureEdge.Node(childComplexity), true
 
-	case "PlaceContainerToContainerResponse.error":
-		if e.complexity.PlaceContainerToContainerResponse.Error == nil {
+	case "PlaceContainerToContainerResponse.dstContainer":
+		if e.complexity.PlaceContainerToContainerResponse.DstContainer == nil {
 			break
 		}
 
-		return e.complexity.PlaceContainerToContainerResponse.Error(childComplexity), true
+		return e.complexity.PlaceContainerToContainerResponse.DstContainer(childComplexity), true
 
-	case "PlaceItemToContainerResponse.error":
-		if e.complexity.PlaceItemToContainerResponse.Error == nil {
+	case "PlaceContainerToContainerResponse.previousContainer":
+		if e.complexity.PlaceContainerToContainerResponse.PreviousContainer == nil {
 			break
 		}
 
-		return e.complexity.PlaceItemToContainerResponse.Error(childComplexity), true
+		return e.complexity.PlaceContainerToContainerResponse.PreviousContainer(childComplexity), true
+
+	case "PlaceContainerToContainerResponse.srcContainer":
+		if e.complexity.PlaceContainerToContainerResponse.SrcContainer == nil {
+			break
+		}
+
+		return e.complexity.PlaceContainerToContainerResponse.SrcContainer(childComplexity), true
+
+	case "PlaceItemToContainerResponse.container":
+		if e.complexity.PlaceItemToContainerResponse.Container == nil {
+			break
+		}
+
+		return e.complexity.PlaceItemToContainerResponse.Container(childComplexity), true
+
+	case "PlaceItemToContainerResponse.item":
+		if e.complexity.PlaceItemToContainerResponse.Item == nil {
+			break
+		}
+
+		return e.complexity.PlaceItemToContainerResponse.Item(childComplexity), true
+
+	case "PlaceItemToContainerResponse.previousContainer":
+		if e.complexity.PlaceItemToContainerResponse.PreviousContainer == nil {
+			break
+		}
+
+		return e.complexity.PlaceItemToContainerResponse.PreviousContainer(childComplexity), true
 
 	case "Query.container":
 		if e.complexity.Query.Container == nil {
@@ -814,7 +844,9 @@ input PlaceContainerToContainer {
 }
 
 type PlaceContainerToContainerResponse {
-    error: Error
+	srcContainer: Container!
+	dstContainer: Container!
+	previousContainer: Container
 }
 
 enum ContainerType {
@@ -900,7 +932,9 @@ input PlaceItemToContainer {
 }
 
 type PlaceItemToContainerResponse {
-    error: Error
+    container: Container
+	item: Item
+	previousContainer: Container
 }
 
 input ArchiveItem {
@@ -2012,14 +2046,14 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 		Object:     "Item",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Item().ID(rctx, obj)
+		return obj.ID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2031,9 +2065,9 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
@@ -2816,7 +2850,7 @@ func (ec *executionContext) _PictureEdge_node(ctx context.Context, field graphql
 	return ec.marshalOPicture2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐPicture(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PlaceContainerToContainerResponse_error(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceContainerToContainerResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _PlaceContainerToContainerResponse_srcContainer(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceContainerToContainerResponse) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2834,7 +2868,77 @@ func (ec *executionContext) _PlaceContainerToContainerResponse_error(ctx context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Error, nil
+		return obj.SrcContainer, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Container)
+	fc.Result = res
+	return ec.marshalNContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlaceContainerToContainerResponse_dstContainer(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceContainerToContainerResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlaceContainerToContainerResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DstContainer, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Container)
+	fc.Result = res
+	return ec.marshalNContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlaceContainerToContainerResponse_previousContainer(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceContainerToContainerResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlaceContainerToContainerResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PreviousContainer, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2843,12 +2947,12 @@ func (ec *executionContext) _PlaceContainerToContainerResponse_error(ctx context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*gmodels.Error)
+	res := resTmp.(*models.Container)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _PlaceItemToContainerResponse_error(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceItemToContainerResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _PlaceItemToContainerResponse_container(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceItemToContainerResponse) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2866,7 +2970,7 @@ func (ec *executionContext) _PlaceItemToContainerResponse_error(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Error, nil
+		return obj.Container, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2875,9 +2979,73 @@ func (ec *executionContext) _PlaceItemToContainerResponse_error(ctx context.Cont
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*gmodels.Error)
+	res := resTmp.(*models.Container)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlaceItemToContainerResponse_item(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceItemToContainerResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlaceItemToContainerResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Item, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Item)
+	fc.Result = res
+	return ec.marshalOItem2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PlaceItemToContainerResponse_previousContainer(ctx context.Context, field graphql.CollectedField, obj *gmodels.PlaceItemToContainerResponse) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PlaceItemToContainerResponse",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PreviousContainer, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Container)
+	fc.Result = res
+	return ec.marshalOContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_item(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5149,19 +5317,10 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Item")
 		case "id":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Item_id(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._Item_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "name":
 			out.Values[i] = ec._Item_name(ctx, field, obj)
 		case "metadata":
@@ -5434,8 +5593,18 @@ func (ec *executionContext) _PlaceContainerToContainerResponse(ctx context.Conte
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PlaceContainerToContainerResponse")
-		case "error":
-			out.Values[i] = ec._PlaceContainerToContainerResponse_error(ctx, field, obj)
+		case "srcContainer":
+			out.Values[i] = ec._PlaceContainerToContainerResponse_srcContainer(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "dstContainer":
+			out.Values[i] = ec._PlaceContainerToContainerResponse_dstContainer(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "previousContainer":
+			out.Values[i] = ec._PlaceContainerToContainerResponse_previousContainer(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5458,8 +5627,12 @@ func (ec *executionContext) _PlaceItemToContainerResponse(ctx context.Context, s
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PlaceItemToContainerResponse")
-		case "error":
-			out.Values[i] = ec._PlaceItemToContainerResponse_error(ctx, field, obj)
+		case "container":
+			out.Values[i] = ec._PlaceItemToContainerResponse_container(ctx, field, obj)
+		case "item":
+			out.Values[i] = ec._PlaceItemToContainerResponse_item(ctx, field, obj)
+		case "previousContainer":
+			out.Values[i] = ec._PlaceItemToContainerResponse_previousContainer(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

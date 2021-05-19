@@ -12,10 +12,6 @@ import (
 	"github.com/j45k4/invertarify/models"
 )
 
-func (r *itemResolver) ID(ctx context.Context, obj *models.Item) (string, error) {
-	return fmt.Sprint(obj.ID), nil
-}
-
 func (r *itemResolver) PathParts(ctx context.Context, obj *models.Item) ([]*gmodels.PathPart, error) {
 	pathParts := []*gmodels.PathPart{}
 
@@ -58,3 +54,13 @@ func (r *itemResolver) Pictures(ctx context.Context, obj *models.Item) (*gmodels
 func (r *Resolver) Item() generated.ItemResolver { return &itemResolver{r} }
 
 type itemResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *itemResolver) ID(ctx context.Context, obj *models.Item) (string, error) {
+	return fmt.Sprint(obj.ID), nil
+}

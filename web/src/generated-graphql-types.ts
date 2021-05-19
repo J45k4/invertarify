@@ -238,7 +238,9 @@ export type PlaceContainerToContainer = {
 
 export type PlaceContainerToContainerResponse = {
   __typename?: 'PlaceContainerToContainerResponse';
-  error?: Maybe<Error>;
+  srcContainer: Container;
+  dstContainer: Container;
+  previousContainer?: Maybe<Container>;
 };
 
 export type PlaceItemToContainer = {
@@ -248,7 +250,9 @@ export type PlaceItemToContainer = {
 
 export type PlaceItemToContainerResponse = {
   __typename?: 'PlaceItemToContainerResponse';
-  error?: Maybe<Error>;
+  container?: Maybe<Container>;
+  item?: Maybe<Item>;
+  previousContainer?: Maybe<Container>;
 };
 
 export type Query = {
@@ -457,7 +461,19 @@ export type PlaceItemToContainerMutationVariables = Exact<{
 
 export type PlaceItemToContainerMutation = (
   { __typename?: 'Mutation' }
-  & { placeItemToContainer: { __typename: 'PlaceItemToContainerResponse' } }
+  & { placeItemToContainer: (
+    { __typename?: 'PlaceItemToContainerResponse' }
+    & { container?: Maybe<(
+      { __typename?: 'Container' }
+      & Pick<Container, 'id' | 'name'>
+    )>, item?: Maybe<(
+      { __typename?: 'Item' }
+      & Pick<Item, 'id' | 'name'>
+    )>, previousContainer?: Maybe<(
+      { __typename?: 'Container' }
+      & Pick<Container, 'id' | 'name'>
+    )> }
+  ) }
 );
 
 export type PlaceContainerToContainerMutationVariables = Exact<{
@@ -467,7 +483,19 @@ export type PlaceContainerToContainerMutationVariables = Exact<{
 
 export type PlaceContainerToContainerMutation = (
   { __typename?: 'Mutation' }
-  & { placeContainerToContainer: { __typename: 'PlaceContainerToContainerResponse' } }
+  & { placeContainerToContainer: (
+    { __typename?: 'PlaceContainerToContainerResponse' }
+    & { srcContainer: (
+      { __typename?: 'Container' }
+      & Pick<Container, 'id' | 'name'>
+    ), dstContainer: (
+      { __typename?: 'Container' }
+      & Pick<Container, 'id' | 'name'>
+    ), previousContainer?: Maybe<(
+      { __typename?: 'Container' }
+      & Pick<Container, 'id' | 'name'>
+    )> }
+  ) }
 );
 
 export type Container_NodeQueryVariables = Exact<{
@@ -848,7 +876,18 @@ export type UpdateContainerMutationOptions = Apollo.BaseMutationOptions<UpdateCo
 export const PlaceItemToContainerDocument = gql`
     mutation placeItemToContainer($input: PlaceItemToContainer!) {
   placeItemToContainer(input: $input) {
-    __typename
+    container {
+      id
+      name
+    }
+    item {
+      id
+      name
+    }
+    previousContainer {
+      id
+      name
+    }
   }
 }
     `;
@@ -881,7 +920,18 @@ export type PlaceItemToContainerMutationOptions = Apollo.BaseMutationOptions<Pla
 export const PlaceContainerToContainerDocument = gql`
     mutation placeContainerToContainer($input: PlaceContainerToContainer!) {
   placeContainerToContainer(input: $input) {
-    __typename
+    srcContainer {
+      id
+      name
+    }
+    dstContainer {
+      id
+      name
+    }
+    previousContainer {
+      id
+      name
+    }
   }
 }
     `;

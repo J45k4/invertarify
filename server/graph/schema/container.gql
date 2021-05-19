@@ -47,7 +47,9 @@ input PlaceContainerToContainer {
 }
 
 type PlaceContainerToContainerResponse {
-    error: Error
+	srcContainer: Container!
+	dstContainer: Container!
+	previousContainer: Container
 }
 
 enum ContainerType {

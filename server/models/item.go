@@ -3,10 +3,10 @@ package models
 import "time"
 
 type Item struct {
-	ID          int32
+	ID          int
 	Name        string
 	Metadata    *string
-	ContainerID *int32
+	ContainerID *int
 	Barcode     string
 	CreatedAt   time.Time
 }

@@ -45,7 +45,9 @@ input PlaceItemToContainer {
 }
 
 type PlaceItemToContainerResponse {
-    error: Error
+    container: Container
+	item: Item
+	previousContainer: Container
 }
 
 input ArchiveItem {

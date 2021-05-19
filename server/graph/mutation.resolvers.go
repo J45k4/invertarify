@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/j45k4/invertarify/graph/generated"
 	gmodels "github.com/j45k4/invertarify/graph/model"
@@ -77,72 +76,71 @@ func (r *mutationResolver) UpdateContainer(ctx context.Context, input gmodels.Up
 }
 
 func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmodels.PlaceItemToContainer) (*gmodels.PlaceItemToContainerResponse, error) {
+	container := models.Container{}
+
+	r.DB.Find(&container, input.ContainerID)
+
+	if container.ID == 0 {
+		return &gmodels.PlaceItemToContainerResponse{}, r.DB.Error
+	}
+
 	item := models.Item{}
 
 	r.DB.Find(&item, input.ItemID)
 
-	itemID, _ := strconv.Atoi(input.ContainerID)
-	itemID32 := int32(itemID)
+	if item.ID == 0 {
+		return &gmodels.PlaceItemToContainerResponse{}, r.DB.Error
+	}
 
-	item.ContainerID = &itemID32
+	var previousContainer *models.Container = nil
+
+	if item.ContainerID != nil {
+		r.DB.Find(&previousContainer, item.ContainerID)
+	}
+
+	item.ContainerID = &container.ID
 
 	r.DB.Save(&item)
 
-	// container
-
-	// containerID := uniqueIdAsNullableInt(input.ContainerID)
-
-	// container, _ := models.FindContainer(ctx, r.DB, uniqueIdAsInt(input.ContainerID))
-
-	// if container == nil {
-	// 	return &gmodels.PlaceItemToContainerResponse{}, nil
-	// }
-
-	// item, _ := models.FindItem(ctx, r.DB, uniqueIdAsInt(input.ItemID))
-
-	// item.ContainerID = containerID
-
-	// item.Update(ctx, r.DB, boil.Infer())
-
-	return &gmodels.PlaceItemToContainerResponse{}, r.DB.Error
+	return &gmodels.PlaceItemToContainerResponse{
+		Container:         &container,
+		Item:              &item,
+		PreviousContainer: previousContainer,
+	}, r.DB.Error
 }
 
 func (r *mutationResolver) PlaceContainerToContainer(ctx context.Context, input gmodels.PlaceContainerToContainer) (*gmodels.PlaceContainerToContainerResponse, error) {
-	container := models.Container{}
+	srcContainer := models.Container{}
 
-	r.DB.Find(&container, input.SrcContainerID)
+	r.DB.Find(&srcContainer, input.SrcContainerID)
 
-	if container.ID == 0 {
+	if srcContainer.ID == 0 {
 		return &gmodels.PlaceContainerToContainerResponse{}, nil
 	}
 
-	if input.DstContainerID == input.SrcContainerID {
+	var previousContainer *models.Container = nil
+
+	if srcContainer.ContainerID != nil {
+		r.DB.Find(&previousContainer, srcContainer.ContainerID)
+	}
+
+	dstContainer := models.Container{}
+
+	r.DB.Find(&dstContainer, input.DstContainerID)
+
+	if dstContainer.ID == 0 {
 		return &gmodels.PlaceContainerToContainerResponse{}, nil
 	}
 
-	containerID, _ := strconv.Atoi(input.DstContainerID)
+	srcContainer.ContainerID = &dstContainer.ID
 
-	container.ContainerID = &containerID
+	r.DB.Save(srcContainer)
 
-	r.DB.Save(container)
-
-	// dstContainer, _ := models.FindContainer(ctx, r.DB, uniqueIdAsInt(input.DstContainerID))
-
-	// if dstContainer == nil {
-	// 	return &gmodels.PlaceContainerToContainerResponse{}, nil
-	// }
-
-	// srcContainer, _ := models.FindContainer(ctx, r.DB, uniqueIdAsInt(input.SrcContainerID))
-
-	// if srcContainer == nil {
-	// 	return &gmodels.PlaceContainerToContainerResponse{}, nil
-	// }
-
-	// srcContainer.ContainerID = uniqueIdAsNullableInt(input.DstContainerID)
-
-	// srcContainer.Update(ctx, r.DB, boil.Infer())
-
-	return &gmodels.PlaceContainerToContainerResponse{}, nil
+	return &gmodels.PlaceContainerToContainerResponse{
+		SrcContainer:      &srcContainer,
+		DstContainer:      &dstContainer,
+		PreviousContainer: previousContainer,
+	}, nil
 }
 
 func (r *mutationResolver) ArchiveItem(ctx context.Context, input gmodels.ArchiveItem) (*gmodels.ArchiveItemResponse, error) {

@@ -124,7 +124,9 @@ type PlaceContainerToContainer struct {
 }
 
 type PlaceContainerToContainerResponse struct {
-	Error *Error `json:"error"`
+	SrcContainer      *models.Container `json:"srcContainer"`
+	DstContainer      *models.Container `json:"dstContainer"`
+	PreviousContainer *models.Container `json:"previousContainer"`
 }
 
 type PlaceItemToContainer struct {
@@ -133,7 +135,9 @@ type PlaceItemToContainer struct {
 }
 
 type PlaceItemToContainerResponse struct {
-	Error *Error `json:"error"`
+	Container         *models.Container `json:"container"`
+	Item              *models.Item      `json:"item"`
+	PreviousContainer *models.Container `json:"previousContainer"`
 }
 
 type UpdateContainer struct {
