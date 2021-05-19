@@ -40,7 +40,7 @@ export const ContainerNode = (props: {
 		}
 	})
 
-	const [c, ref] = useDrop({
+	const [c, dropRef] = useDrop({
 		accept: [DragType.ITEM, DragType.CONTAINER],
 		drop: (entity: DragEntity, monitor) => {
 			if (entity.type === "item") {
@@ -71,7 +71,7 @@ export const ContainerNode = (props: {
 		}
 	})
 
-	const [c2, ref2] = useDrag({
+	const [c2, dragRef] = useDrag({
 		type: DragType.CONTAINER,
 		item: { type: "container", containerId: props.containerId }
 	})
@@ -81,21 +81,25 @@ export const ContainerNode = (props: {
 	}
 
 	return (
-		<div ref={ref}>
-			<div ref={ref2}>
-				<TreelistNode 
-					header={<Link href={`/container/${props.containerId}`}>{data?.container?.name}</Link>} 
-					showCaret={true}>
-					{data?.container.containers.containers.map(p => (
-						<ContainerNode containerId={p.id} />
+		<div ref={dragRef}>
+			<TreelistNode 
+				header={
+					<span ref={dropRef}>
+						<Link href={`/container/${props.containerId}`}>
+							{data?.container?.name}
+						</Link>
+					</span>
+				} 
+				showCaret={true}>
+				{data?.container.containers.containers.map(p => (
+					<ContainerNode containerId={p.id} />
+				))}
+				<Fragment>
+					{data?.container.items.items.map(p => (
+						<ItemNode itemId={p.id} name={p.name} />
 					))}
-					<Fragment>
-						{data?.container.items.items.map(p => (
-							<ItemNode itemId={p.id} name={p.name} />
-						))}
-					</Fragment>
-				</TreelistNode>
-			</div>
+				</Fragment>
+			</TreelistNode>
 		</div>
 	)
 }
