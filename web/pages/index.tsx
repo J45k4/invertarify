@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Fragment, useState } from 'react'
-import { Button, Card, Container } from 'react-bootstrap'
+import { Button, Card, Col, Container, FormControl, Row } from 'react-bootstrap'
 import { ContainerList } from '../src/container/container-list'
 import { RootNode } from '../src/nodes/root-node'
 import { CreateContainerForm } from '../src/container/create-container-modal'
@@ -25,39 +25,47 @@ export default function Home() {
 			<Fragment>
 				<NavigationBar />
 			</Fragment>
-			<Container>
-				<div>
-					<Button onClick={() => {
-						setCreating(true)
-					}}>
-						Create item
-					</Button>
-				</div>
-				<div>
-					<Button onClick={() => {
-						setCon(true)
-					}}>
-						Create container
-					</Button>
-				</div>
-				<RootNode />
-
-				<CreateItemModal
-					show={creating}
-					onSuccess={() => {
-						setCreating(false)
-					}}
-					onCancel={() => {
-						setCreating(false)
-					}} />
-
-				<CreateContainerForm
-					show={con}
-					onHide={() => {
-						setCon(false)
-					}}
-				 />
+			<Container fluid={true}>
+				<Row>
+					<Col sm={2}>
+						<div style={{
+							marginBottom: "10px"
+						}}>
+							<Button onClick={() => {
+								setCreating(true)
+							}}>
+								Create item
+							</Button>
+						</div>
+						<div>
+							<Button onClick={() => {
+								setCon(true)
+							}}>
+								Create container
+							</Button>
+						</div>
+					</Col>
+					<Col>
+						<FormControl type="text"  />
+						<RootNode />
+					</Col>
+				</Row>
 			</Container>
+
+			<CreateItemModal
+				show={creating}
+				onSuccess={() => {
+					setCreating(false)
+				}}
+				onCancel={() => {
+					setCreating(false)
+				}} />
+
+			<CreateContainerForm
+				show={con}
+				onHide={() => {
+					setCon(false)
+				}}/>
 		</Fragment>
 	)
 }
