@@ -49,6 +49,15 @@ export const CreateItemModal = (props: {
 							input: {
 								name: name
 							}
+						},
+						update: (cache, {data: {createItem: {item}}}) => {
+							cache.modify({
+								fields: {
+									itemsWithoutContainer(items) {
+										return [...items, item]
+									}
+								}
+							})
 						}
 						
 					}).then(() => {

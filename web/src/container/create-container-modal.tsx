@@ -31,6 +31,15 @@ export const CreateContainerForm = (props: {
 							input: {
 								name: name
 							}
+						},
+						update: (cache, {data: {createContainer: {container}}}) => {
+							cache.modify({
+								fields: {
+									rootContainers(containers) {
+										return [...containers, container]
+									}
+								}
+							})
 						}
 					}).then(() => {
 						setName("")
