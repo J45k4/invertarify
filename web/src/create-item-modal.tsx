@@ -61,6 +61,7 @@ export const CreateItemModal = (props: {
 						}
 						
 					}).then(() => {
+						setName("")
 						props.onSuccess()
 					})
 				}}>
