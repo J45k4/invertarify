@@ -67,7 +67,17 @@ export const ContainerNode = (props: {
 									}
 								}
 							})
+
+							return
 						}
+
+						cache.modify({
+							fields: {
+								itemsWithoutContainer(items, {readField}) {
+									return items.filter(p => readField("id", p) != entity.itemId)
+								}
+							}
+						})
 					}
 				}).then(() => {
 					refetch()
@@ -98,7 +108,17 @@ export const ContainerNode = (props: {
 									}
 								}
 							})
+
+							return
 						}
+
+						cache.modify({
+							fields: {
+								rootContainers(containers, {readField}) {
+									return containers.filter(p => readField("id", p) != entity.containerId)
+								}
+							}
+						})
 					}
 				}).then(() => {
 					refetch()
