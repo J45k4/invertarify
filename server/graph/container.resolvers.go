@@ -6,11 +6,22 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/j45k4/invertarify/graph/generated"
 	gmodels "github.com/j45k4/invertarify/graph/model"
 	"github.com/j45k4/invertarify/models"
 )
+
+func (r *containerResolver) DeletedAt(ctx context.Context, obj *models.Container) (*string, error) {
+	if obj.DeletedAt == nil {
+		return nil, nil
+	}
+
+	deletedAt := obj.DeletedAt.Format(time.RFC3339)
+
+	return &deletedAt, nil
+}
 
 func (r *containerResolver) PathParts(ctx context.Context, obj *models.Container) ([]*gmodels.PathPart, error) {
 	pathParts := []*gmodels.PathPart{}
@@ -49,7 +60,9 @@ func (r *containerResolver) PathParts(ctx context.Context, obj *models.Container
 func (r *containerResolver) Items(ctx context.Context, obj *models.Container) (*gmodels.ContainerItemsConnection, error) {
 	items := []*models.Item{}
 
-	r.DB.Where("container_id = ?", obj.ID).Find(&items)
+	r.DB.Where("container_id = ?", obj.ID).
+		Where("deleted_at is null").
+		Find(&items)
 
 	return &gmodels.ContainerItemsConnection{
 		Items: items,

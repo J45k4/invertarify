@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/j45k4/invertarify/graph/generated"
 	gmodels "github.com/j45k4/invertarify/graph/model"
@@ -50,17 +51,17 @@ func (r *itemResolver) Pictures(ctx context.Context, obj *models.Item) (*gmodels
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *itemResolver) DeletedAt(ctx context.Context, obj *models.Item) (*string, error) {
+	if obj.DeletedAt == nil {
+		return nil, nil
+	}
+
+	deletedAt := obj.DeletedAt.Format(time.RFC3339)
+
+	return &deletedAt, nil
+}
+
 // Item returns generated.ItemResolver implementation.
 func (r *Resolver) Item() generated.ItemResolver { return &itemResolver{r} }
 
 type itemResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *itemResolver) ID(ctx context.Context, obj *models.Item) (string, error) {
-	return fmt.Sprint(obj.ID), nil
-}

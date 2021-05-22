@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/j45k4/invertarify/graph/generated"
 	gmodels "github.com/j45k4/invertarify/graph/model"
@@ -144,19 +145,71 @@ func (r *mutationResolver) PlaceContainerToContainer(ctx context.Context, input 
 }
 
 func (r *mutationResolver) ArchiveItem(ctx context.Context, input gmodels.ArchiveItem) (*gmodels.ArchiveItemResponse, error) {
-	// item, _ := models.FindItem(ctx, r.DB, uniqueIdAsInt(input.ItemID))
+	item := models.Item{}
 
-	// item.Delete(ctx, r.DB)
+	r.DB.Find(&item, input.ItemID)
 
-	return &gmodels.ArchiveItemResponse{}, nil
+	if item.ID == 0 {
+		return &gmodels.ArchiveItemResponse{}, nil
+	}
+
+	now := time.Now()
+
+	item.DeletedAt = &now
+
+	r.DB.Save(item)
+
+	return &gmodels.ArchiveItemResponse{
+		Item: &item,
+	}, nil
 }
 
 func (r *mutationResolver) ArchiveContainer(ctx context.Context, input gmodels.ArchiveContainer) (*gmodels.ArchiveContainerResponse, error) {
-	// container, _ := models.FindContainer(ctx, r.DB, uniqueIdAsInt(*input.ContainerID))
+	tx := r.DB.Begin()
 
-	// container.Delete(ctx, r.DB)
+	container := models.Container{}
 
-	return &gmodels.ArchiveContainerResponse{}, nil
+	tx.Find(&container, input.ContainerID)
+
+	if container.ID == 0 {
+		return &gmodels.ArchiveContainerResponse{}, nil
+	}
+
+	now := time.Now()
+
+	container.DeletedAt = &now
+
+	tx.Save(container)
+
+	childItems := []models.Item{}
+
+	tx.Where("container_id = ?", input.ContainerID).Find(&childItems)
+
+	childContainers := []models.Container{}
+
+	tx.Where("container_id = ?", input.ContainerID).Find(&childContainers)
+
+	if input.ArchiveContent != nil && *input.ArchiveContent {
+
+	} else {
+		for _, childItem := range childItems {
+			childItem.ContainerID = nil
+
+			tx.Save(childItem)
+		}
+
+		for _, chilContainer := range childContainers {
+			chilContainer.ContainerID = nil
+
+			tx.Save(chilContainer)
+		}
+	}
+
+	tx.Commit()
+
+	return &gmodels.ArchiveContainerResponse{
+		Container: &container,
+	}, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

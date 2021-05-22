@@ -5,6 +5,7 @@ type Item {
     barcode: String
 	pathParts: [PathPart!]!
     pictures: ItemPicturesConnection!
+	deletedAt: DateTime
 }
 
 type ItemsConnection {
@@ -55,7 +56,7 @@ input ArchiveItem {
 }
 
 type ArchiveItemResponse {
-    error: Error
+    item: Item!
 }
 
 input UpdateItem {

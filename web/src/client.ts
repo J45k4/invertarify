@@ -25,7 +25,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 		for (const err of graphQLErrors) {
 			console.log(err)
 
-			if (err.extensions.code === "UNAUTHENTICATED") {
+			if (err.extensions && err.extensions.code === "UNAUTHENTICATED") {
 				window.location.href = "/login"
 			}
 		}

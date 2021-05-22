@@ -25,7 +25,7 @@ func (r *queryResolver) Item(ctx context.Context, itemID string) (*models.Item, 
 func (r *queryResolver) Items(ctx context.Context, input gmodels.Items) (*gmodels.ItemsConnection, error) {
 	itemsConnection := &gmodels.ItemsConnection{}
 
-	query := r.DB
+	query := r.DB.Where("deleted_at is null")
 
 	if input.SearchWord != nil {
 		query = query.Where("lower(name) like ?", "%"+strings.ToLower(*input.SearchWord)+"%")
@@ -33,16 +33,16 @@ func (r *queryResolver) Items(ctx context.Context, input gmodels.Items) (*gmodel
 
 	if input.Status != nil {
 		if *input.Status == gmodels.ItemStatusInUse {
-			query.Where("container_id is null")
+			query = query.Where("container_id is null")
 		}
 
 		if *input.Status == gmodels.ItemStatusNotInUse {
-			query.Where("container_id is not null")
+			query = query.Where("container_id is not null")
 		}
 	}
 
 	if input.ContainerID != nil {
-		query.Where("container_id = ?", input.ContainerID)
+		query = query.Where("container_id = ?", input.ContainerID)
 	}
 
 	query.Find(&itemsConnection.Items)
@@ -95,7 +95,9 @@ func (r *queryResolver) Picture(ctx context.Context, pictureID string) (*models.
 func (r *queryResolver) RootContainers(ctx context.Context) ([]*models.Container, error) {
 	containers := []*models.Container{}
 
-	r.DB.Where("container_id is null").Find(&containers)
+	r.DB.Where("container_id is null").
+		Where("deleted_at is null").
+		Find(&containers)
 
 	return containers, nil
 }
@@ -103,7 +105,9 @@ func (r *queryResolver) RootContainers(ctx context.Context) ([]*models.Container
 func (r *queryResolver) ItemsWithoutContainer(ctx context.Context) ([]*models.Item, error) {
 	items := []*models.Item{}
 
-	r.DB.Where("container_id is null").Find(&items)
+	r.DB.Where("container_id is null").
+		Where("deleted_at is null").
+		Find(&items)
 
 	return items, nil
 }

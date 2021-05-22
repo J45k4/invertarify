@@ -52,15 +52,16 @@ type ComplexityRoot struct {
 	}
 
 	ArchiveContainerResponse struct {
-		Error func(childComplexity int) int
+		Container func(childComplexity int) int
 	}
 
 	ArchiveItemResponse struct {
-		Error func(childComplexity int) int
+		Item func(childComplexity int) int
 	}
 
 	Container struct {
 		Containers         func(childComplexity int) int
+		DeletedAt          func(childComplexity int) int
 		ID                 func(childComplexity int) int
 		Items              func(childComplexity int) int
 		Name               func(childComplexity int) int
@@ -108,6 +109,7 @@ type ComplexityRoot struct {
 
 	Item struct {
 		Barcode   func(childComplexity int) int
+		DeletedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Metadata  func(childComplexity int) int
 		Name      func(childComplexity int) int
@@ -181,6 +183,7 @@ type ComplexityRoot struct {
 }
 
 type ContainerResolver interface {
+	DeletedAt(ctx context.Context, obj *models.Container) (*string, error)
 	PathParts(ctx context.Context, obj *models.Container) ([]*gmodels.PathPart, error)
 	Items(ctx context.Context, obj *models.Container) (*gmodels.ContainerItemsConnection, error)
 	Containers(ctx context.Context, obj *models.Container) (*gmodels.ContainerContainersConnection, error)
@@ -190,6 +193,7 @@ type ContainerResolver interface {
 type ItemResolver interface {
 	PathParts(ctx context.Context, obj *models.Item) ([]*gmodels.PathPart, error)
 	Pictures(ctx context.Context, obj *models.Item) (*gmodels.ItemPicturesConnection, error)
+	DeletedAt(ctx context.Context, obj *models.Item) (*string, error)
 }
 type MutationResolver interface {
 	CreateItem(ctx context.Context, input gmodels.CreateItem) (*gmodels.CreateItemResponse, error)
@@ -237,19 +241,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AddPictureForItemResponse.Error(childComplexity), true
 
-	case "ArchiveContainerResponse.error":
-		if e.complexity.ArchiveContainerResponse.Error == nil {
+	case "ArchiveContainerResponse.container":
+		if e.complexity.ArchiveContainerResponse.Container == nil {
 			break
 		}
 
-		return e.complexity.ArchiveContainerResponse.Error(childComplexity), true
+		return e.complexity.ArchiveContainerResponse.Container(childComplexity), true
 
-	case "ArchiveItemResponse.error":
-		if e.complexity.ArchiveItemResponse.Error == nil {
+	case "ArchiveItemResponse.item":
+		if e.complexity.ArchiveItemResponse.Item == nil {
 			break
 		}
 
-		return e.complexity.ArchiveItemResponse.Error(childComplexity), true
+		return e.complexity.ArchiveItemResponse.Item(childComplexity), true
 
 	case "Container.containers":
 		if e.complexity.Container.Containers == nil {
@@ -257,6 +261,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Container.Containers(childComplexity), true
+
+	case "Container.deletedAt":
+		if e.complexity.Container.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Container.DeletedAt(childComplexity), true
 
 	case "Container.id":
 		if e.complexity.Container.ID == nil {
@@ -397,6 +408,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.Barcode(childComplexity), true
+
+	case "Item.deletedAt":
+		if e.complexity.Item.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Item.DeletedAt(childComplexity), true
 
 	case "Item.id":
 		if e.complexity.Item.ID == nil {
@@ -785,6 +803,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "graph/schema/common.gql", Input: `scalar Upload
+scalar DateTime
 
 # directive @goModel(model: String, models: [String!]) on OBJECT
 #     | INPUT_OBJECT
@@ -799,6 +818,7 @@ var sources = []*ast.Source{
 type Container {
     id: ID!
     name: String
+	deletedAt: DateTime
 	pathParts: [PathPart!]!
     items: ContainerItemsConnection!
     containers: ContainerContainersConnection!
@@ -869,7 +889,7 @@ input ArchiveContainer {
 }
 
 type ArchiveContainerResponse {
-    error: Error
+    container: Container!
 }
 
 input UpdateContainer {
@@ -892,6 +912,7 @@ type Error {
     barcode: String
 	pathParts: [PathPart!]!
     pictures: ItemPicturesConnection!
+	deletedAt: DateTime
 }
 
 type ItemsConnection {
@@ -942,7 +963,7 @@ input ArchiveItem {
 }
 
 type ArchiveItemResponse {
-    error: Error
+    item: Item!
 }
 
 input UpdateItem {
@@ -1301,7 +1322,7 @@ func (ec *executionContext) _AddPictureForItemResponse_error(ctx context.Context
 	return ec.marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ArchiveContainerResponse_error(ctx context.Context, field graphql.CollectedField, obj *gmodels.ArchiveContainerResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _ArchiveContainerResponse_container(ctx context.Context, field graphql.CollectedField, obj *gmodels.ArchiveContainerResponse) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1319,21 +1340,24 @@ func (ec *executionContext) _ArchiveContainerResponse_error(ctx context.Context,
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Error, nil
+		return obj.Container, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*gmodels.Error)
+	res := resTmp.(*models.Container)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalNContainer2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐContainer(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ArchiveItemResponse_error(ctx context.Context, field graphql.CollectedField, obj *gmodels.ArchiveItemResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _ArchiveItemResponse_item(ctx context.Context, field graphql.CollectedField, obj *gmodels.ArchiveItemResponse) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1351,18 +1375,21 @@ func (ec *executionContext) _ArchiveItemResponse_error(ctx context.Context, fiel
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Error, nil
+		return obj.Item, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*gmodels.Error)
+	res := resTmp.(*models.Item)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Container_id(ctx context.Context, field graphql.CollectedField, obj *models.Container) (ret graphql.Marshaler) {
@@ -1430,6 +1457,38 @@ func (ec *executionContext) _Container_name(ctx context.Context, field graphql.C
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Container_deletedAt(ctx context.Context, field graphql.CollectedField, obj *models.Container) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Container",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Container().DeletedAt(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Container_pathParts(ctx context.Context, field graphql.CollectedField, obj *models.Container) (ret graphql.Marshaler) {
@@ -2234,6 +2293,38 @@ func (ec *executionContext) _Item_pictures(ctx context.Context, field graphql.Co
 	res := resTmp.(*gmodels.ItemPicturesConnection)
 	fc.Result = res
 	return ec.marshalNItemPicturesConnection2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐItemPicturesConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Item_deletedAt(ctx context.Context, field graphql.CollectedField, obj *models.Item) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Item().DeletedAt(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalODateTime2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ItemPicturesConnection_edges(ctx context.Context, field graphql.CollectedField, obj *gmodels.ItemPicturesConnection) (ret graphql.Marshaler) {
@@ -4958,8 +5049,11 @@ func (ec *executionContext) _ArchiveContainerResponse(ctx context.Context, sel a
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ArchiveContainerResponse")
-		case "error":
-			out.Values[i] = ec._ArchiveContainerResponse_error(ctx, field, obj)
+		case "container":
+			out.Values[i] = ec._ArchiveContainerResponse_container(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4982,8 +5076,11 @@ func (ec *executionContext) _ArchiveItemResponse(ctx context.Context, sel ast.Se
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("ArchiveItemResponse")
-		case "error":
-			out.Values[i] = ec._ArchiveItemResponse_error(ctx, field, obj)
+		case "item":
+			out.Values[i] = ec._ArchiveItemResponse_item(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5013,6 +5110,17 @@ func (ec *executionContext) _Container(ctx context.Context, sel ast.SelectionSet
 			}
 		case "name":
 			out.Values[i] = ec._Container_name(ctx, field, obj)
+		case "deletedAt":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Container_deletedAt(ctx, field, obj)
+				return res
+			})
 		case "pathParts":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5356,6 +5464,17 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "deletedAt":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Item_deletedAt(ctx, field, obj)
 				return res
 			})
 		default:
@@ -6870,6 +6989,21 @@ func (ec *executionContext) unmarshalOContaninersSearchOptions2ᚖgithubᚗcom�
 	}
 	res, err := ec.unmarshalInputContaninersSearchOptions(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalODateTime2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalString(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalODateTime2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(*v)
 }
 
 func (ec *executionContext) marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx context.Context, sel ast.SelectionSet, v *gmodels.Error) graphql.Marshaler {

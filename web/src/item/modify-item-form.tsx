@@ -1,7 +1,8 @@
 import gql from "graphql-tag"
+import { useRouter } from "next/router"
 import React, { Fragment, useEffect, useState } from "react"
-import { Card, Form } from "react-bootstrap"
-import { useModify_Item_FormQuery, useUpdateItemMutation } from "../generated-graphql-types"
+import { Button, Card, Form } from "react-bootstrap"
+import { useModify_Item_FormQuery, useUpdateItemMutation, useArchiveItemMutation } from "../generated-graphql-types"
 import { useAutoUpdateValue } from "../input-hooks"
 
 gql`
@@ -23,7 +24,11 @@ export const ModifyItemForm = (props: {
 		}
 	})
 
-	const [updateItem, { loading }] = useUpdateItemMutation()
+	const [archiveItem] = useArchiveItemMutation()
+
+	const [updateItem] = useUpdateItemMutation()
+
+	const router = useRouter()
 
 	const [state, setState] = useAutoUpdateValue(data?.item, async (s) => {
 		await updateItem({
@@ -67,6 +72,19 @@ export const ModifyItemForm = (props: {
 							})
 						}} />
 				</Form.Group>
+				<Button variant="danger" onClick={() => {
+					archiveItem({
+						variables: {
+							input: {
+								itemId: props.itemId
+							}
+						}
+					}).then(() => {
+						router.push("/")
+					})
+				}}>
+					Remove
+				</Button>
 			</Card.Body>
 		</Card>
 	)

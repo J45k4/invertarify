@@ -16,12 +16,14 @@ gql`
 			containers {
 				containers {
 					id
+					deletedAt
 				}
 			}
 			items {
 				items {
 					id
 					name
+					deletedAt
 				}
 			}
 		}
@@ -127,11 +129,11 @@ export const ContainerNode = (props: {
 					</span>	
 				} 
 				showCaret={true}>
-				{data?.container.containers.containers.map(p => (
+				{data?.container.containers.containers.filter(p => !p.deletedAt).map(p => (
 					<ContainerNode key={p.id} containerId={p.id} />
 				))}
 				<Fragment>
-					{data?.container.items.items.map(p => (
+					{data?.container.items.items.filter(p => !p.deletedAt).map(p => (
 						<ItemNode key={p.id} itemId={p.id} name={p.name} />
 					))}
 				</Fragment>

@@ -7,4 +7,5 @@ type Container struct {
 	Name        string
 	ContainerID *int
 	CreatedAt   time.Time
+	DeletedAt   *time.Time
 }

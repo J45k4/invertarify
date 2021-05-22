@@ -9,4 +9,5 @@ type Item struct {
 	ContainerID *int
 	Barcode     string
 	CreatedAt   time.Time
+	DeletedAt   *time.Time
 }

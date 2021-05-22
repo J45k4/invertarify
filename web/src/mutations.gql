@@ -60,3 +60,23 @@ mutation placeContainerToContainer($input: PlaceContainerToContainer!) {
 		}
 	}
 }
+
+mutation archiveItem($input: ArchiveItem!) {
+	archiveItem(input: $input) {
+		item {
+			id
+			name
+			deletedAt
+		}
+	}
+}
+
+mutation archiveContainer($input: ArchiveContainer!) {
+	archiveContainer(input: $input) {
+		container {
+			id
+			name
+			deletedAt
+		}
+	}
+}

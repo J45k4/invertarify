@@ -26,7 +26,7 @@ type ArchiveContainer struct {
 }
 
 type ArchiveContainerResponse struct {
-	Error *Error `json:"error"`
+	Container *models.Container `json:"container"`
 }
 
 type ArchiveItem struct {
@@ -34,7 +34,7 @@ type ArchiveItem struct {
 }
 
 type ArchiveItemResponse struct {
-	Error *Error `json:"error"`
+	Item *models.Item `json:"item"`
 }
 
 type ContainerContainersConnection struct {

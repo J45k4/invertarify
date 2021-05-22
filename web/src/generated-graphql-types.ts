@@ -12,6 +12,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  DateTime: any;
   Upload: any;
 };
 
@@ -32,7 +33,7 @@ export type ArchiveContainer = {
 
 export type ArchiveContainerResponse = {
   __typename?: 'ArchiveContainerResponse';
-  error?: Maybe<Error>;
+  container: Container;
 };
 
 export type ArchiveItem = {
@@ -41,13 +42,14 @@ export type ArchiveItem = {
 
 export type ArchiveItemResponse = {
   __typename?: 'ArchiveItemResponse';
-  error?: Maybe<Error>;
+  item: Item;
 };
 
 export type Container = {
   __typename?: 'Container';
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
+  deletedAt?: Maybe<Scalars['DateTime']>;
   pathParts: Array<PathPart>;
   items: ContainerItemsConnection;
   containers: ContainerContainersConnection;
@@ -118,6 +120,7 @@ export type CreateItemResponse = {
   item?: Maybe<Item>;
 };
 
+
 export type Error = {
   __typename?: 'Error';
   code?: Maybe<Scalars['Int']>;
@@ -132,6 +135,7 @@ export type Item = {
   barcode?: Maybe<Scalars['String']>;
   pathParts: Array<PathPart>;
   pictures: ItemPicturesConnection;
+  deletedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type ItemPicturesConnection = {
@@ -518,6 +522,38 @@ export type PlaceContainerToContainerMutation = (
   ) }
 );
 
+export type ArchiveItemMutationVariables = Exact<{
+  input: ArchiveItem;
+}>;
+
+
+export type ArchiveItemMutation = (
+  { __typename?: 'Mutation' }
+  & { archiveItem: (
+    { __typename?: 'ArchiveItemResponse' }
+    & { item: (
+      { __typename?: 'Item' }
+      & Pick<Item, 'id' | 'name' | 'deletedAt'>
+    ) }
+  ) }
+);
+
+export type ArchiveContainerMutationVariables = Exact<{
+  input: ArchiveContainer;
+}>;
+
+
+export type ArchiveContainerMutation = (
+  { __typename?: 'Mutation' }
+  & { archiveContainer: (
+    { __typename?: 'ArchiveContainerResponse' }
+    & { container: (
+      { __typename?: 'Container' }
+      & Pick<Container, 'id' | 'name' | 'deletedAt'>
+    ) }
+  ) }
+);
+
 export type Container_NodeQueryVariables = Exact<{
   containerId: Scalars['ID'];
 }>;
@@ -532,13 +568,13 @@ export type Container_NodeQuery = (
       { __typename?: 'ContainerContainersConnection' }
       & { containers: Array<(
         { __typename?: 'Container' }
-        & Pick<Container, 'id'>
+        & Pick<Container, 'id' | 'deletedAt'>
       )> }
     ), items: (
       { __typename?: 'ContainerItemsConnection' }
       & { items: Array<(
         { __typename?: 'Item' }
-        & Pick<Item, 'id' | 'name'>
+        & Pick<Item, 'id' | 'name' | 'deletedAt'>
       )> }
     ) }
   )> }
@@ -551,10 +587,10 @@ export type Container_TreeQuery = (
   { __typename?: 'Query' }
   & { rootContainers: Array<(
     { __typename?: 'Container' }
-    & Pick<Container, 'id'>
+    & Pick<Container, 'id' | 'deletedAt'>
   )>, itemsWithoutContainer: Array<(
     { __typename?: 'Item' }
-    & Pick<Item, 'id' | 'name'>
+    & Pick<Item, 'id' | 'name' | 'deletedAt'>
   )> }
 );
 
@@ -1023,6 +1059,80 @@ export function usePlaceContainerToContainerMutation(baseOptions?: Apollo.Mutati
 export type PlaceContainerToContainerMutationHookResult = ReturnType<typeof usePlaceContainerToContainerMutation>;
 export type PlaceContainerToContainerMutationResult = Apollo.MutationResult<PlaceContainerToContainerMutation>;
 export type PlaceContainerToContainerMutationOptions = Apollo.BaseMutationOptions<PlaceContainerToContainerMutation, PlaceContainerToContainerMutationVariables>;
+export const ArchiveItemDocument = gql`
+    mutation archiveItem($input: ArchiveItem!) {
+  archiveItem(input: $input) {
+    item {
+      id
+      name
+      deletedAt
+    }
+  }
+}
+    `;
+export type ArchiveItemMutationFn = Apollo.MutationFunction<ArchiveItemMutation, ArchiveItemMutationVariables>;
+
+/**
+ * __useArchiveItemMutation__
+ *
+ * To run a mutation, you first call `useArchiveItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useArchiveItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [archiveItemMutation, { data, loading, error }] = useArchiveItemMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useArchiveItemMutation(baseOptions?: Apollo.MutationHookOptions<ArchiveItemMutation, ArchiveItemMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ArchiveItemMutation, ArchiveItemMutationVariables>(ArchiveItemDocument, options);
+      }
+export type ArchiveItemMutationHookResult = ReturnType<typeof useArchiveItemMutation>;
+export type ArchiveItemMutationResult = Apollo.MutationResult<ArchiveItemMutation>;
+export type ArchiveItemMutationOptions = Apollo.BaseMutationOptions<ArchiveItemMutation, ArchiveItemMutationVariables>;
+export const ArchiveContainerDocument = gql`
+    mutation archiveContainer($input: ArchiveContainer!) {
+  archiveContainer(input: $input) {
+    container {
+      id
+      name
+      deletedAt
+    }
+  }
+}
+    `;
+export type ArchiveContainerMutationFn = Apollo.MutationFunction<ArchiveContainerMutation, ArchiveContainerMutationVariables>;
+
+/**
+ * __useArchiveContainerMutation__
+ *
+ * To run a mutation, you first call `useArchiveContainerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useArchiveContainerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [archiveContainerMutation, { data, loading, error }] = useArchiveContainerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useArchiveContainerMutation(baseOptions?: Apollo.MutationHookOptions<ArchiveContainerMutation, ArchiveContainerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ArchiveContainerMutation, ArchiveContainerMutationVariables>(ArchiveContainerDocument, options);
+      }
+export type ArchiveContainerMutationHookResult = ReturnType<typeof useArchiveContainerMutation>;
+export type ArchiveContainerMutationResult = Apollo.MutationResult<ArchiveContainerMutation>;
+export type ArchiveContainerMutationOptions = Apollo.BaseMutationOptions<ArchiveContainerMutation, ArchiveContainerMutationVariables>;
 export const Container_NodeDocument = gql`
     query container_node($containerId: ID!) {
   container(containerId: $containerId) {
@@ -1031,12 +1141,14 @@ export const Container_NodeDocument = gql`
     containers {
       containers {
         id
+        deletedAt
       }
     }
     items {
       items {
         id
         name
+        deletedAt
       }
     }
   }
@@ -1074,10 +1186,12 @@ export const Container_TreeDocument = gql`
     query container_tree {
   rootContainers {
     id
+    deletedAt
   }
   itemsWithoutContainer {
     id
     name
+    deletedAt
   }
 }
     `;

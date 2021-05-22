@@ -1,7 +1,8 @@
 import gql from "graphql-tag"
+import { useRouter } from "next/router"
 import React from "react"
-import { Card, FormControl } from "react-bootstrap"
-import { useModify_ContainerQuery, useUpdateContainerMutation } from "../generated-graphql-types"
+import { Button, Card, FormControl } from "react-bootstrap"
+import { useModify_ContainerQuery, useUpdateContainerMutation, useArchiveContainerMutation } from "../generated-graphql-types"
 import { useAutoUpdateValue } from "../input-hooks"
 
 gql`
@@ -23,6 +24,8 @@ export const ModifyContainer = (props: {
 	})
 
 	const [updateContainer] = useUpdateContainerMutation()
+	const [archiveContainer] = useArchiveContainerMutation()
+	const router = useRouter()
 
 	const [state, setState] = useAutoUpdateValue(data?.container, async (c) => {
 		await updateContainer({
@@ -51,6 +54,20 @@ export const ModifyContainer = (props: {
 						name: e.target.value
 					})
 				}} />
+
+				<Button variant="danger" onClick={() => {
+					archiveContainer({
+						variables: {
+							input: {
+								containerId: props.containerId
+							}
+						}
+					}).then(() => {
+						router.push("/")
+					})
+				}}>
+					Delete
+				</Button>
 			</Card.Body>
 		</Card>
 	)

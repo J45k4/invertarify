@@ -11,10 +11,12 @@ gql`
 	query container_tree {
 		rootContainers {
 			id
+			deletedAt
 		}
 		itemsWithoutContainer {
 			id
 			name
+			deletedAt
 		}
 	}
 `
@@ -31,10 +33,10 @@ export const RootNode = () => {
 	return (
 		<Card>
 			<Card.Body>
-				{data?.rootContainers.map(p => (
+				{data?.rootContainers.filter(p => !p.deletedAt).map(p => (
 					<ContainerNode containerId={p.id} />
 				))}
-				{data?.itemsWithoutContainer.map(p => (
+				{data?.itemsWithoutContainer.filter(p => !p.deletedAt).map(p => (
 					<div key={p.id}>
 						<ItemNode itemId={p.id} name={p.name} />
 					</div>
