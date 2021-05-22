@@ -1,7 +1,7 @@
 import React, { Fragment } from "react"
 import { Container } from "react-bootstrap"
 import { NavigationBar } from "../src/navigationbar"
-import { SearchResult } from "../src/search/search-result"
+import { SearchResult } from "../src/main-content/search-result"
 
 export default function SearchResults() {
 	return (

@@ -25,27 +25,27 @@ func (r *queryResolver) Item(ctx context.Context, itemID string) (*models.Item, 
 func (r *queryResolver) Items(ctx context.Context, input gmodels.Items) (*gmodels.ItemsConnection, error) {
 	itemsConnection := &gmodels.ItemsConnection{}
 
-	mods := []qm.QueryMod{}
+	query := r.DB
 
 	if input.SearchWord != nil {
-		mods = append(mods, qm.Where("lower(name) like ?", "%"+strings.ToLower(*input.SearchWord)+"%"))
+		query = query.Where("lower(name) like ?", "%"+strings.ToLower(*input.SearchWord)+"%")
 	}
 
 	if input.Status != nil {
 		if *input.Status == gmodels.ItemStatusInUse {
-			mods = append(mods, qm.Where("container_id is null"))
+			query.Where("container_id is null")
 		}
 
 		if *input.Status == gmodels.ItemStatusNotInUse {
-			mods = append(mods, qm.Where("container_id is not null"))
+			query.Where("container_id is not null")
 		}
 	}
 
 	if input.ContainerID != nil {
-		mods = append(mods, qm.Where("container_id = ?", uniqueIdPtrAsNullableInt(input.ContainerID)))
+		query.Where("container_id = ?", input.ContainerID)
 	}
 
-	r.DB.Find(&itemsConnection.Items)
+	query.Find(&itemsConnection.Items)
 
 	return itemsConnection, nil
 }

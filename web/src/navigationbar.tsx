@@ -18,7 +18,7 @@ export const NavigationBar = () => {
 					<Navbar.Brand>Invertarify</Navbar.Brand>
 				</Link>
 				<Navbar>
-					<FormControl type="text" />
+
 				</Navbar>		
 		</Navbar>
 	)

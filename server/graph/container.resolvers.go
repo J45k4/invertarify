@@ -35,7 +35,7 @@ func (r *containerResolver) PathParts(ctx context.Context, obj *models.Container
 			pathParts = append([]*gmodels.PathPart{
 				{
 					ID:   fmt.Sprint(container.ID),
-					Name: &container.Name,
+					Name: container.Name,
 				},
 			}, pathParts...)
 

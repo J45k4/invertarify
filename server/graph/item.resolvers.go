@@ -35,7 +35,7 @@ func (r *itemResolver) PathParts(ctx context.Context, obj *models.Item) ([]*gmod
 			pathParts = append([]*gmodels.PathPart{
 				{
 					ID:   fmt.Sprint(container.ID),
-					Name: &container.Name,
+					Name: container.Name,
 				},
 			}, pathParts...)
 

@@ -27,6 +27,20 @@ gql`
 	}
 `
 
+export const converPathParts = (parts: {
+	id: string
+	name: string
+}[]) => {
+	return parts.map(p => {
+		const href = `/container/${p.id}`
+
+		return {
+			href: href,
+			name: p.name,
+		}
+	})
+}
+
 export const EntityPath = (props: {
 	parts: {
 		name: string
@@ -58,14 +72,7 @@ export const ItemPath = (props: {
 	})
 
 	return (
-		<EntityPath parts={data?.item.pathParts.map(p => {
-			const href = `/container/${p.id}`
-
-			return {
-				href: href,
-				name: p.name,
-			}
-		}) || []} /> 
+		<EntityPath parts={data ? converPathParts(data.item.pathParts) : []} /> 
 	)
 }
 
@@ -79,13 +86,6 @@ export const ContainerPath = (props: {
 	})
 
 	return (
-		<EntityPath parts={data?.container.pathParts.map(p => {
-			const href = `/container/${p.id}`
-
-			return {
-				href: href,
-				name: p.name,
-			}
-		}) || []} /> 
+		<EntityPath parts={data ? converPathParts(data.container.pathParts) : []} /> 
 	)
 }

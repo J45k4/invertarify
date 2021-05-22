@@ -217,7 +217,7 @@ export type MutationArchiveContainerArgs = {
 export type PathPart = {
   __typename?: 'PathPart';
   id: Scalars['ID'];
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
 };
 
 export type Picture = {
@@ -402,6 +402,26 @@ export type Items_ResultsQuery = (
     & { items: Array<(
       { __typename?: 'Item' }
       & Pick<Item, 'id' | 'name'>
+    )> }
+  ) }
+);
+
+export type Serarch_ResultsQueryVariables = Exact<{
+  input: Items;
+}>;
+
+
+export type Serarch_ResultsQuery = (
+  { __typename?: 'Query' }
+  & { items: (
+    { __typename?: 'ItemsConnection' }
+    & { items: Array<(
+      { __typename?: 'Item' }
+      & Pick<Item, 'id' | 'name'>
+      & { pathParts: Array<(
+        { __typename?: 'PathPart' }
+        & Pick<PathPart, 'id' | 'name'>
+      )> }
     )> }
   ) }
 );
@@ -764,6 +784,48 @@ export function useItems_ResultsLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type Items_ResultsQueryHookResult = ReturnType<typeof useItems_ResultsQuery>;
 export type Items_ResultsLazyQueryHookResult = ReturnType<typeof useItems_ResultsLazyQuery>;
 export type Items_ResultsQueryResult = Apollo.QueryResult<Items_ResultsQuery, Items_ResultsQueryVariables>;
+export const Serarch_ResultsDocument = gql`
+    query serarch_results($input: Items!) {
+  items(input: $input) {
+    items {
+      id
+      name
+      pathParts {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useSerarch_ResultsQuery__
+ *
+ * To run a query within a React component, call `useSerarch_ResultsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSerarch_ResultsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSerarch_ResultsQuery({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSerarch_ResultsQuery(baseOptions: Apollo.QueryHookOptions<Serarch_ResultsQuery, Serarch_ResultsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<Serarch_ResultsQuery, Serarch_ResultsQueryVariables>(Serarch_ResultsDocument, options);
+      }
+export function useSerarch_ResultsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Serarch_ResultsQuery, Serarch_ResultsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<Serarch_ResultsQuery, Serarch_ResultsQueryVariables>(Serarch_ResultsDocument, options);
+        }
+export type Serarch_ResultsQueryHookResult = ReturnType<typeof useSerarch_ResultsQuery>;
+export type Serarch_ResultsLazyQueryHookResult = ReturnType<typeof useSerarch_ResultsLazyQuery>;
+export type Serarch_ResultsQueryResult = Apollo.QueryResult<Serarch_ResultsQuery, Serarch_ResultsQueryVariables>;
 export const UpdateItemDocument = gql`
     mutation updateItem($input: UpdateItem!) {
   updateItem(input: $input) {

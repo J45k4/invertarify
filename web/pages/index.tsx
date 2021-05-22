@@ -10,6 +10,7 @@ import { ItemsList } from '../src/item/items-list'
 import { Items } from '../src/items'
 import { NavigationBar } from '../src/navigationbar'
 import styles from '../styles/Home.module.css'
+import { MainContent } from '../src/main-content/main-content'
 
 export default function Home() {
 	const [creating, setCreating] = useState(false)
@@ -46,8 +47,7 @@ export default function Home() {
 						</div>
 					</Col>
 					<Col>
-						<FormControl type="text"  />
-						<RootNode />
+						<MainContent />
 					</Col>
 				</Row>
 			</Container>
