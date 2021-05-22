@@ -14,5 +14,5 @@ input AddPictureForItem {
 }
 
 type AddPictureForItemResponse {
-    error: Error
+    item: Item!
 }

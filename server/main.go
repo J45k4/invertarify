@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -29,6 +30,10 @@ func main() {
 		config.DBHost,
 		config.DBName,
 	)
+
+	if config.DataPath != "" {
+		os.MkdirAll(config.DataPath, 0755)
+	}
 
 	db, err := sql.Open("mysql", connectionString)
 

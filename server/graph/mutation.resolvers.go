@@ -5,9 +5,13 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"io"
+	"log"
+	"os"
+	"path"
 	"time"
 
+	"github.com/j45k4/invertarify/config"
 	"github.com/j45k4/invertarify/graph/generated"
 	gmodels "github.com/j45k4/invertarify/graph/model"
 	"github.com/j45k4/invertarify/models"
@@ -41,7 +45,35 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, input gmodels.UpdateI
 }
 
 func (r *mutationResolver) AddPictureForItem(ctx context.Context, input gmodels.AddPictureForItem) (*gmodels.AddPictureForItemResponse, error) {
-	panic(fmt.Errorf("not implemented"))
+	if config.DataPath == "" {
+		log.Println("No datapath provided")
+		return nil, createError(ctx, InternalServerError)
+	}
+
+	var item *models.Item = nil
+
+	err := r.DB.Find(&item, input.ItemID).Error
+
+	if err != nil {
+		logError(ctx, err)
+		return nil, createError(ctx, InternalServerError)
+	}
+
+	if item == nil {
+		return nil, createError(ctx, ItemDoesNotExist)
+	}
+
+	filePath := path.Join(config.DataPath, input.Picture.Filename)
+
+	file, _ := os.OpenFile(filePath, os.O_CREATE, 0600)
+
+	defer file.Close()
+
+	io.CopyBuffer(file, input.Picture.File, nil)
+
+	return &gmodels.AddPictureForItemResponse{
+		Item: item,
+	}, nil
 }
 
 func (r *mutationResolver) CreateContainer(ctx context.Context, input gmodels.CreateContainer) (*gmodels.CreateContainerResponse, error) {

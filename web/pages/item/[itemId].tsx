@@ -19,17 +19,16 @@ export default function ItemPage() {
 					<ItemPath itemId={itemId} />
 				</div>}
 		</Container>
-        <Container>	
+        <Container>
+			{itemId && 
 			<Row>
 				<Col>
-					{itemId && 
-					<ModifyItemForm itemId={itemId} />}
+					<ModifyItemForm itemId={itemId} />
 				</Col>
 				<Col>
-					<ItemImages />
+					<ItemImages itemId={itemId} />
 				</Col>
-			</Row>
-			
+			</Row>}
 		</Container>
     </Fragment>
 }

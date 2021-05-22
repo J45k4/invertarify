@@ -23,7 +23,7 @@ export type AddPictureForItem = {
 
 export type AddPictureForItemResponse = {
   __typename?: 'AddPictureForItemResponse';
-  error?: Maybe<Error>;
+  item: Item;
 };
 
 export type ArchiveContainer = {
@@ -550,6 +550,22 @@ export type ArchiveContainerMutation = (
     & { container: (
       { __typename?: 'Container' }
       & Pick<Container, 'id' | 'name' | 'deletedAt'>
+    ) }
+  ) }
+);
+
+export type AddPictureForItemMutationVariables = Exact<{
+  input: AddPictureForItem;
+}>;
+
+
+export type AddPictureForItemMutation = (
+  { __typename?: 'Mutation' }
+  & { addPictureForItem: (
+    { __typename?: 'AddPictureForItemResponse' }
+    & { item: (
+      { __typename?: 'Item' }
+      & Pick<Item, 'id' | 'name'>
     ) }
   ) }
 );
@@ -1133,6 +1149,42 @@ export function useArchiveContainerMutation(baseOptions?: Apollo.MutationHookOpt
 export type ArchiveContainerMutationHookResult = ReturnType<typeof useArchiveContainerMutation>;
 export type ArchiveContainerMutationResult = Apollo.MutationResult<ArchiveContainerMutation>;
 export type ArchiveContainerMutationOptions = Apollo.BaseMutationOptions<ArchiveContainerMutation, ArchiveContainerMutationVariables>;
+export const AddPictureForItemDocument = gql`
+    mutation addPictureForItem($input: AddPictureForItem!) {
+  addPictureForItem(input: $input) {
+    item {
+      id
+      name
+    }
+  }
+}
+    `;
+export type AddPictureForItemMutationFn = Apollo.MutationFunction<AddPictureForItemMutation, AddPictureForItemMutationVariables>;
+
+/**
+ * __useAddPictureForItemMutation__
+ *
+ * To run a mutation, you first call `useAddPictureForItemMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPictureForItemMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPictureForItemMutation, { data, loading, error }] = useAddPictureForItemMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddPictureForItemMutation(baseOptions?: Apollo.MutationHookOptions<AddPictureForItemMutation, AddPictureForItemMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddPictureForItemMutation, AddPictureForItemMutationVariables>(AddPictureForItemDocument, options);
+      }
+export type AddPictureForItemMutationHookResult = ReturnType<typeof useAddPictureForItemMutation>;
+export type AddPictureForItemMutationResult = Apollo.MutationResult<AddPictureForItemMutation>;
+export type AddPictureForItemMutationOptions = Apollo.BaseMutationOptions<AddPictureForItemMutation, AddPictureForItemMutationVariables>;
 export const Container_NodeDocument = gql`
     query container_node($containerId: ID!) {
   container(containerId: $containerId) {

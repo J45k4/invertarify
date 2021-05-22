@@ -1,10 +1,11 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client';
 import { onError } from "@apollo/client/link/error";
 import { setContext } from '@apollo/client/link/context';
+import { createUploadLink } from "apollo-upload-client"
 
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL ? process.env.NEXT_PUBLIC_SERVER_URL : ""
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
 	uri: `${serverUrl}/graphql`
 })
 

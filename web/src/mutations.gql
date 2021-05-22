@@ -80,3 +80,12 @@ mutation archiveContainer($input: ArchiveContainer!) {
 		}
 	}
 }
+
+mutation addPictureForItem($input: AddPictureForItem!) {
+	addPictureForItem(input: $input) {
+		item {
+			id
+			name
+		}
+	}
+}

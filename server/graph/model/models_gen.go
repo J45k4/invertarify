@@ -17,7 +17,7 @@ type AddPictureForItem struct {
 }
 
 type AddPictureForItemResponse struct {
-	Error *Error `json:"error"`
+	Item *models.Item `json:"item"`
 }
 
 type ArchiveContainer struct {

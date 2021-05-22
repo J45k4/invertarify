@@ -48,7 +48,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	AddPictureForItemResponse struct {
-		Error func(childComplexity int) int
+		Item func(childComplexity int) int
 	}
 
 	ArchiveContainerResponse struct {
@@ -234,12 +234,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "AddPictureForItemResponse.error":
-		if e.complexity.AddPictureForItemResponse.Error == nil {
+	case "AddPictureForItemResponse.item":
+		if e.complexity.AddPictureForItemResponse.Item == nil {
 			break
 		}
 
-		return e.complexity.AddPictureForItemResponse.Error(childComplexity), true
+		return e.complexity.AddPictureForItemResponse.Item(childComplexity), true
 
 	case "ArchiveContainerResponse.container":
 		if e.complexity.ArchiveContainerResponse.Container == nil {
@@ -1008,7 +1008,7 @@ input AddPictureForItem {
 }
 
 type AddPictureForItemResponse {
-    error: Error
+    item: Item!
 }`, BuiltIn: false},
 	{Name: "graph/schema/query.gql", Input: `
 type Query {
@@ -1290,7 +1290,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _AddPictureForItemResponse_error(ctx context.Context, field graphql.CollectedField, obj *gmodels.AddPictureForItemResponse) (ret graphql.Marshaler) {
+func (ec *executionContext) _AddPictureForItemResponse_item(ctx context.Context, field graphql.CollectedField, obj *gmodels.AddPictureForItemResponse) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1308,18 +1308,21 @@ func (ec *executionContext) _AddPictureForItemResponse_error(ctx context.Context
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Error, nil
+		return obj.Item, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*gmodels.Error)
+	res := resTmp.(*models.Item)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚖgithubᚗcomᚋj45k4ᚋinvertarifyᚋmodelsᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ArchiveContainerResponse_container(ctx context.Context, field graphql.CollectedField, obj *gmodels.ArchiveContainerResponse) (ret graphql.Marshaler) {
@@ -5025,8 +5028,11 @@ func (ec *executionContext) _AddPictureForItemResponse(ctx context.Context, sel 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AddPictureForItemResponse")
-		case "error":
-			out.Values[i] = ec._AddPictureForItemResponse_error(ctx, field, obj)
+		case "item":
+			out.Values[i] = ec._AddPictureForItemResponse_item(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
