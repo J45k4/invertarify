@@ -95,9 +95,14 @@ func (r *queryResolver) Picture(ctx context.Context, pictureID string) (*models.
 func (r *queryResolver) RootContainers(ctx context.Context) ([]*models.Container, error) {
 	containers := []*models.Container{}
 
-	r.DB.Where("container_id is null").
+	err := r.DB.Where("container_id is null").
 		Where("deleted_at is null").
-		Find(&containers)
+		Find(&containers).Error
+
+	if err != nil {
+		logError(ctx, err)
+		return nil, createError(ctx, InternalServerError)
+	}
 
 	return containers, nil
 }

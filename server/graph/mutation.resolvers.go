@@ -79,10 +79,15 @@ func (r *mutationResolver) UpdateContainer(ctx context.Context, input gmodels.Up
 func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmodels.PlaceItemToContainer) (*gmodels.PlaceItemToContainerResponse, error) {
 	container := models.Container{}
 
-	r.DB.Find(&container, input.ContainerID)
+	err := r.DB.Find(&container, input.ContainerID).Error
+
+	if err != nil {
+		logError(ctx, err)
+		return nil, createError(ctx, InternalServerError)
+	}
 
 	if container.ID == 0 {
-		return &gmodels.PlaceItemToContainerResponse{}, r.DB.Error
+		return nil, createError(ctx, ContainerDoesNotExist)
 	}
 
 	item := models.Item{}
@@ -90,7 +95,7 @@ func (r *mutationResolver) PlaceItemToContainer(ctx context.Context, input gmode
 	r.DB.Find(&item, input.ItemID)
 
 	if item.ID == 0 {
-		return &gmodels.PlaceItemToContainerResponse{}, r.DB.Error
+		return nil, createError(ctx, ItemDoesNotExist)
 	}
 
 	var previousContainer *models.Container = nil
@@ -172,7 +177,7 @@ func (r *mutationResolver) ArchiveContainer(ctx context.Context, input gmodels.A
 	tx.Find(&container, input.ContainerID)
 
 	if container.ID == 0 {
-		return &gmodels.ArchiveContainerResponse{}, nil
+		return &gmodels.ArchiveContainerResponse{}, createError(ctx, ContainerDoesNotExist)
 	}
 
 	now := time.Now()
