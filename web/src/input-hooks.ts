@@ -98,10 +98,6 @@ export const useAutoUpdateValue = <T>(serverValue: T, update: (s: T) => Promise<
 			return
 		}
 
-		// handler = setTimeout(() => {
-
-		// }, 400);
-
 		if (dirty == true) {
 			setDirty(false)
 			setUpdating(true)
@@ -116,10 +112,6 @@ export const useAutoUpdateValue = <T>(serverValue: T, update: (s: T) => Promise<
 		}
 
 		setValue(serverValue)
-
-		return () => {
-			// clearTimeout(handler);
-		};
 	}, [serverValue, updating, dirty, dvalue])
 
 
